@@ -9,7 +9,6 @@ namespace PlayerBots.AI.SkillHelpers
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {
-
             // Skills
             AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
             skill4.customName = "DeployTurret";

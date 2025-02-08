@@ -6,7 +6,7 @@ namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("Prefabs/CharacterBodies/RoR1ChefBody")]
     [CustomSurvivor("https://thunderstore.io/package/LuaFubuki/BackupSquad/", "0.0.3")]
-    class ChefHelper : AiSkillHelper
+    class ChefModHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {

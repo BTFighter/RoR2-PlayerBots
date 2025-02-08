@@ -51,7 +51,7 @@ namespace PlayerBots.AI.SkillHelpers
             skill2.requireSkillReady = true;
             skill2.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
             skill2.minDistance = 0;
-            skill2.maxDistance = 30;
+            skill2.maxDistance = 50;
             skill2.selectionRequiresTargetLoS = true;
             skill2.activationRequiresTargetLoS = true;
             skill2.activationRequiresAimConfirmation = true;
