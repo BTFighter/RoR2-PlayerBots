@@ -14,6 +14,7 @@ A fork of a mod for Risk of Rain 2...
 [Driver](https://thunderstore.io/package/rob_gaming/Driver/)  
 [Jhin](https://thunderstore.io/package/SeroRonin/Jhin/)  
 [Jinx](https://thunderstore.io/package/lemonlust/JinxMod/)  
+[Lee Hyperreal](https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/)  
 [Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
 [Pathfinder](https://thunderstore.io/package/Bog/Pathfinder/)  
 [Pilot](https://thunderstore.io/package/EnforcerGang/Pilot/)  
@@ -23,6 +24,7 @@ A fork of a mod for Risk of Rain 2...
 [Sett](https://thunderstore.io/package/lemonlust/SettMod/)  
 [Sorceress](https://thunderstore.io/package/Frosthex/SorceressMod/)  
 [Tesla Trooper](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
+[Wanderer](https://thunderstore.io/package/tsuyoikenko/Wanderer/)  
 [Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) ([v0.0.1 version](https://thunderstore.io/package/Team_Pepega/Zeri/))  
 
 Characters only for v0.0.1:  
