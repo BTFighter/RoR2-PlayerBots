@@ -1,7 +1,7 @@
 # RoR2-PlayerBots
-A mod for Risk of Rain 2...  
+A fork of a mod for Risk of Rain 2...  
 
-...with (admittedly low quality) Custom Character support for:  
+...with added (admittedly low quality) custom character support for:  
 [Alien Hominid](https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/)  
 [Arsonist](https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/)  
 [Assassin](https://thunderstore.io/package/HasteReapr/AssassinMod/)  
@@ -33,7 +33,7 @@ Characters only for v0.0.1:
 [Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/) (Deprecated)  
 [Widowmaker](https://thunderstore.io/package/Team_Pepega/Widowmaker/) (Deprecated)  
 
-Also Now supports newer versions of the ff. mods:  
+Also now supports newer versions of the ff. mods:  
 [Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
 [Bandit Reloaded](https://thunderstore.io/package/Dragonyck/BanditReloaded/)  
 
