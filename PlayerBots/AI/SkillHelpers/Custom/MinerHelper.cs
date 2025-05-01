@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("MinerBody")]
-    [CustomSurvivor("https://thunderstore.io/package/rob/MinerUnearthed/", "1.5.2")]
+    [CustomSurvivor("https://thunderstore.io/package/rob/MinerUnearthed/", "1.9.21")]
     class MinerHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

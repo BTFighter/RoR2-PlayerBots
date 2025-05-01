@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("SettBody")]
-    [CustomSurvivor("https://thunderstore.io/package/lemonlust/SettMod/", "4.5.2")]
+    [CustomSurvivor("https://thunderstore.io/package/lemonlust/SettMod/", "4.6.1")]
     class SettHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

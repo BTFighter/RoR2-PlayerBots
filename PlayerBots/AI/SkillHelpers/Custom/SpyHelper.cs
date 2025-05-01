@@ -1,8 +1,7 @@
-﻿using RoR2;
-using RoR2.CharacterAI;
+﻿using RoR2.CharacterAI;
 using UnityEngine;
 
-namespace PlayerBots.AI.SkillHelpers
+namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("SpyBody")]
     [CustomSurvivor("https://thunderstore.io/package/tsuyoikenko/Spy/", "1.1.2")]

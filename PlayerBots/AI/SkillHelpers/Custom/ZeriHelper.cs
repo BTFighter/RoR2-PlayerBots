@@ -1,11 +1,10 @@
-﻿using RoR2;
-using RoR2.CharacterAI;
+﻿using RoR2.CharacterAI;
 using UnityEngine;
 
-namespace PlayerBots.AI.SkillHelpers
+namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("ZeriBody")]
-    [CustomSurvivor("https://thunderstore.io/package/Team_Pepega/Zeri/", "1.0.2")]
+    [CustomSurvivor("https://thunderstore.io/package/DragonycksModdingComms/Zeri/versions/", "1.0.4")]
     class ZeriHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

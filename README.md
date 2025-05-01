@@ -10,7 +10,7 @@ A fork of a mod for Risk of Rain 2...
 [Celestial War Tank](https://thunderstore.io/package/CheeseWithHoles/Celestial_War_Tank/)  
 [Deputy](https://thunderstore.io/package/Bog/Deputy/)  
 [Desolator](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
-[Driver](https://thunderstore.io/package/rob_gaming/Driver/)  
+[Driver](https://thunderstore.io/package/public_ParticleSystem/Driver/)  
 [Jhin](https://thunderstore.io/package/SeroRonin/Jhin/)  
 [Jinx](https://thunderstore.io/package/lemonlust/JinxMod/)  
 [Lee Hyperreal](https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/)    
@@ -22,6 +22,7 @@ A fork of a mod for Risk of Rain 2...
 [Sorceress](https://thunderstore.io/package/Frosthex/SorceressMod/)  
 [Tesla Trooper](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
 [Wanderer](https://thunderstore.io/package/tsuyoikenko/Wanderer/)  
+[Widowmaker](https://thunderstore.io/package/DragonycksModdingComms/Widowmaker/)  
 [Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) ([v0.0.1 version](https://thunderstore.io/package/Team_Pepega/Zeri/))  
 
 Characters only for v0.0.1:  
@@ -30,7 +31,6 @@ Characters only for v0.0.1:
 [Scout](https://thunderstore.io/package/tsuyoikenko/Scout/) (Deprecated)  
 [Spy](https://thunderstore.io/package/tsuyoikenko/Spy/) (Deprecated)  
 [Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/) (Deprecated)  
-[Widowmaker](https://thunderstore.io/package/Team_Pepega/Widowmaker/) (Deprecated)  
 
 Also now supports newer versions of the ff. mods:  
 [Bandit Reloaded](https://thunderstore.io/package/Dragonyck/BanditReloaded/)  

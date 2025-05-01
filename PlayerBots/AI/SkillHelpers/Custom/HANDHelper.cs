@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("HANDOverclockedBody")]
-    [CustomSurvivor("https://thunderstore.io/package/Moffein/HAND_OVERCLOCKED_BETA/", "	0.0.17")]
+    [CustomSurvivor("https://thunderstore.io/package/EnforcerGang/HAND_OVERCLOCKED/", "	1.5.1")]
     class HANDHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

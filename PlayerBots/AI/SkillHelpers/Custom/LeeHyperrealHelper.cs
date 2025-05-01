@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("LeeHyperrealBody")]
-    [CustomSurvivor("https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/", "1.0.4")]
+    [CustomSurvivor("https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/", "1.1.12")]
     class LeeHyperrealHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

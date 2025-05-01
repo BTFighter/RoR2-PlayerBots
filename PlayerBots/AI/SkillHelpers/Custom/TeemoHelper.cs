@@ -1,8 +1,7 @@
-﻿using RoR2;
-using RoR2.CharacterAI;
+﻿using RoR2.CharacterAI;
 using UnityEngine;
 
-namespace PlayerBots.AI.SkillHelpers
+namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("TeemoBody")]
     [CustomSurvivor("https://thunderstore.io/package/Dragonyck/Teemo/", "1.1.0")]

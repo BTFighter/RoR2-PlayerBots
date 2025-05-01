@@ -5,7 +5,7 @@ namespace PlayerBots.AI.SkillHelpers.Custom
 {
 	//This is just a mixture of Railgunner and Sniper's code, very early access.
     [SkillHelperSurvivor("JinxBody")]
-    [CustomSurvivor("https://thunderstore.io/package/lemonlust/JinxMod/", "1.0.11")]
+    [CustomSurvivor("https://thunderstore.io/package/lemonlust/JinxMod/", "1.4.0")]
     class JinxHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

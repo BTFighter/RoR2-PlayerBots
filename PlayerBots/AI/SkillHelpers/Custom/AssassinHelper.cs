@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("AssassinSurvivorBody")]
-    [CustomSurvivor("https://thunderstore.io/package/HasteReapr/AssassinMod/", "1.3.1")]
+    [CustomSurvivor("https://thunderstore.io/package/HasteReapr/AssassinMod/", "2.2.2")]
     class AssassinHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

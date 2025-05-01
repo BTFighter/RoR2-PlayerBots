@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("ArsonistBody")]
-    [CustomSurvivor("https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/", "2.1.9")]
+    [CustomSurvivor("https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/", "3.0.2")]
     class ArsonistHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("HenryBody")]
-    [CustomSurvivor("https://thunderstore.io/package/rob/HenryMod/", "1.2.4")]
+    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/HenryMod/", "2.2.0")]
     class HenryHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

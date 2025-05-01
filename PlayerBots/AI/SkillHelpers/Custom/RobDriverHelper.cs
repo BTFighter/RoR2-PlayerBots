@@ -6,7 +6,7 @@ using System;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("RobDriverBody")]
-    [CustomSurvivor("https://thunderstore.io/package/rob_gaming/Driver/", "1.3.5")]
+    [CustomSurvivor("https://thunderstore.io/package/rob_gaming/Driver/", "1.8.0")]
     class RobDriverHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

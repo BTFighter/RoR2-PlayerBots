@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("BasicTankBody")]
-    [CustomSurvivor("https://thunderstore.io/package/CheeseWithHoles/Celestial_War_Tank/", "1.2.0")]
+    [CustomSurvivor("https://thunderstore.io/package/CheeseWithHoles/Celestial_War_Tank/", "2.0.1")]
     class BasicTankHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

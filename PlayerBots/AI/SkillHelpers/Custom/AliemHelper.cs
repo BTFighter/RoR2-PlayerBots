@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("AliemBody")]
-    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/", "1.1.0")]
+    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/", "1.2.4")]
     class AliemHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

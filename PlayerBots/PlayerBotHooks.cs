@@ -241,7 +241,7 @@ namespace PlayerBots
                 // Dont end game on dying
                 if (PlayerBotManager.ContinueAfterDeath.Value)
                 {
-                    IL.RoR2.Stage.FixedUpdate += il =>
+                    IL.RoR2.Stage.Update += il =>
                     {
                         ILCursor c = new ILCursor(il);
                         c.GotoNext(x => x.MatchCallvirt<PlayerCharacterMasterController>("get_isConnected"));
