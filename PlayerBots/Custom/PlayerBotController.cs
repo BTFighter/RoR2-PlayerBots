@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using PlayerBots.AI;
+using UnityEngine.Networking;
 
 namespace PlayerBots.Custom
 {
@@ -58,6 +59,38 @@ namespace PlayerBots.Custom
             return customTargetSkillDriver != null && PlayerBotManager.BotsUseInteractables.Value;
         }
 
+        private void UpdateMasterFollowing()
+        {
+            // Only run in multiplayer
+            if (!NetworkServer.active || NetworkUser.readOnlyInstancesList.Count <= 1)
+                return;
+
+            // Get current master
+            CharacterMaster currentMaster = this.master.GetComponent<AIOwnership>()?.ownerMaster;
+            if (currentMaster == null)
+                return;
+
+            // Check if current master is dead
+            if (currentMaster.IsDeadAndOutOfLivesServer())
+            {
+                // Find a new living player to follow
+                CharacterMaster newMaster = NetworkUser.readOnlyInstancesList
+                    .Where(u => u.master != null && !u.master.IsDeadAndOutOfLivesServer())
+                    .Select(u => u.master)
+                    .FirstOrDefault();
+
+                if (newMaster != null)
+                {
+                    // Update the AI ownership to follow the new master
+                    AIOwnership aiOwnership = this.master.GetComponent<AIOwnership>();
+                    if (aiOwnership != null)
+                    {
+                        aiOwnership.ownerMaster = newMaster;
+                    }
+                }
+            }
+        }
+
         public void FixedUpdate()
         {
             // Skip if no body object or if bot is dead
@@ -65,6 +98,10 @@ namespace PlayerBots.Custom
             {
                 return;
             }
+
+            // Update master following
+            UpdateMasterFollowing();
+
             // Fix bunny hopping
             this.ai.localNavigator.SetFieldValue("walkFrustration", 0f);
             // Check if body interactor has changed
