@@ -1,7 +1,7 @@
 # RoR2-PlayerBots
 A fork of a mod for Risk of Rain 2...  
 
-...with added (admittedly low quality) custom character support for:  
+...with added features and (admittedly low quality) custom character support for:  
 [Alien Hominid](https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/)  
 [Arsonist](https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/)  
 [Assassin](https://thunderstore.io/package/HasteReapr/AssassinMod/)  
