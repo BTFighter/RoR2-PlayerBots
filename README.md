@@ -7,6 +7,7 @@ A fork of a mod for Risk of Rain 2...
 [Assassin](https://thunderstore.io/package/HasteReapr/AssassinMod/)  
 [Bastian](https://thunderstore.io/package/TeamSillyGuy/Bastian/)  
 [Bomber](https://thunderstore.io/package/Dragonyck/Bomber/)  
+[Cadet](https://thunderstore.io/package/tsuyoikenko/Cadet/)  
 [Celestial War Tank](https://thunderstore.io/package/CheeseWithHoles/Celestial_War_Tank/)  
 [Deputy](https://thunderstore.io/package/Bog/Deputy/)  
 [Desolator](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
@@ -21,9 +22,13 @@ A fork of a mod for Risk of Rain 2...
 [Pilot](https://thunderstore.io/package/EnforcerGang/Pilot/)  
 [Ravager](https://thunderstore.io/package/rob_gaming/Ravager/)  
 [Rocket](https://thunderstore.io/package/EnforcerGang/Rocket/)   
+[Rocket (Raccoon)](https://thunderstore.io/package/VCR/RocketRaccoon/)  
+[Scout](https://thunderstore.io/package/tsuyoikenko/Scout/)  
 [Sett](https://thunderstore.io/package/lemonlust/SettMod/)  
 [Sorceress](https://thunderstore.io/package/Frosthex/SorceressMod/)  
 [Space Marine](https://thunderstore.io/package/DragonycksModdingComms/SpaceMarine/)   
+[Spy](https://thunderstore.io/package/tsuyoikenko/Spy/)   
+[Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/)   
 [Templar](https://thunderstore.io/package/prodzpod/TemplarReturnsReturns/)  
 [Tesla Trooper](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
 [Wanderer](https://thunderstore.io/package/tsuyoikenko/Wanderer/)  
@@ -31,11 +36,7 @@ A fork of a mod for Risk of Rain 2...
 [Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) ([v0.0.1 version](https://thunderstore.io/package/Team_Pepega/Zeri/))  
 
 Characters only for v0.0.1:  
-[Cadet](https://thunderstore.io/package/tsuyoikenko/Cadet/) (Deprecated)  
 [RMOR](https://thunderstore.io/package/MoriyaFaith/RMOR_REFORGED/) (Deprecated)  
-[Scout](https://thunderstore.io/package/tsuyoikenko/Scout/) (Deprecated)  
-[Spy](https://thunderstore.io/package/tsuyoikenko/Spy/) (Deprecated)  
-[Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/) (Deprecated)  
 
 Also now supports newer versions of the ff. mods:  
 [Bandit Reloaded](https://thunderstore.io/package/Dragonyck/BanditReloaded/)  
