@@ -43,14 +43,14 @@ namespace PlayerBots.Custom
             }
         }
 
-        // Override Update to handle personal space
+        // Handle personal space checks
         public void Update()
         {
             // Check personal space
             CheckPersonalSpace();
         }
 
-        private void CheckPersonalSpace()
+        public void CheckPersonalSpace()
         {
             // Only check periodically to avoid performance issues
             if (Time.time < lastPersonalSpaceCheck + personalSpaceCheckInterval) return;

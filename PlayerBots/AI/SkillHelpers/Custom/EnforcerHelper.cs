@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("EnforcerBody")]
-    [CustomSurvivor("https://thunderstore.io/package/EnforcerGang/Enforcer/", "3.11.4")]
+    [CustomSurvivor("https://thunderstore.io/package/EnforcerGang/Enforcer/", "3.11.6")]
     class EnforcerHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
@@ -60,7 +60,6 @@ namespace PlayerBots.AI.SkillHelpers
             skill4.resetCurrentEnemyOnNextDriverSelection = false;
             skill4.noRepeat = true;
             skill4.shouldSprint = false;
-            //skill4.driverUpdateTimerOverride = 0.5f;
 
             AISkillDriver skill4_shoot = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
             skill4_shoot.customName = "SpecialShoot";
@@ -78,30 +77,16 @@ namespace PlayerBots.AI.SkillHelpers
             skill4_shoot.resetCurrentEnemyOnNextDriverSelection = true;
             skill4_shoot.noRepeat = false;
             skill4_shoot.shouldSprint = false;
-            skill4_shoot.driverUpdateTimerOverride = 5f;
+            skill4_shoot.driverUpdateTimerOverride = 3f;
             skill4_shoot.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
 
-            // Skills
-            /*AISkillDriver skill1 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            skill1.customName = "Primary";
-            skill1.skillSlot = RoR2.SkillSlot.Primary;
-            skill1.requireSkillReady = true;
-            skill1.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            skill1.minDistance = 0;
-            skill1.maxDistance = 50;
-            skill1.selectionRequiresTargetLoS = true;
-            skill1.activationRequiresTargetLoS = true;
-            skill1.activationRequiresAimConfirmation = false;
-            skill1.movementType = AISkillDriver.MovementType.StrafeMovetarget;
-            skill1.aimType = AISkillDriver.AimType.AtMoveTarget;
-            skill1.ignoreNodeGraph = false;
-            skill1.resetCurrentEnemyOnNextDriverSelection = false;
-            skill1.noRepeat = false;
-            skill1.shouldSprint = false;*/
-
-            skill4.nextHighPriorityOverride = skill4_shoot;
             // Add default skills
             AddDefaultSkills(gameObject, ai, 0);
+
+            // Set up the skill chain
+            skill4.nextHighPriorityOverride = skill4_shoot;
+            skill4_shoot.nextHighPriorityOverride = skill2;
+            skill2.nextHighPriorityOverride = skill3;
         }
     }
 }

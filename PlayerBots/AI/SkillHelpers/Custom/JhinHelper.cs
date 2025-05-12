@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("JhinBody")]
-    [CustomSurvivor("https://thunderstore.io/package/SeroRonin/Jhin/", "1.4.2")]
+    [CustomSurvivor("https://thunderstore.io/package/SeroRonin/Jhin/", "1.4.3")]
     class JhinHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

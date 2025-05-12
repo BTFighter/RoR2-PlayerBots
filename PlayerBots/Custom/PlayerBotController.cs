@@ -65,28 +65,42 @@ namespace PlayerBots.Custom
             if (!NetworkServer.active || NetworkUser.readOnlyInstancesList.Count <= 1)
                 return;
 
-            // Get current master
-            CharacterMaster currentMaster = this.master.GetComponent<AIOwnership>()?.ownerMaster;
-            if (currentMaster == null)
+            // Get all living players
+            var livingPlayers = NetworkUser.readOnlyInstancesList
+                .Where(u => u.master != null && !u.master.IsDeadAndOutOfLivesServer())
+                .Select(u => u.master)
+                .ToList();
+
+            if (livingPlayers.Count == 0)
                 return;
 
-            // Check if current master is dead
-            if (currentMaster.IsDeadAndOutOfLivesServer())
-            {
-                // Find a new living player to follow
-                CharacterMaster newMaster = NetworkUser.readOnlyInstancesList
-                    .Where(u => u.master != null && !u.master.IsDeadAndOutOfLivesServer())
-                    .Select(u => u.master)
-                    .FirstOrDefault();
+            // Get all bots
+            var allBots = CharacterMaster.readOnlyInstancesList
+                .Where(m => m.name.Equals("PlayerBot") && !m.IsDeadAndOutOfLivesServer())
+                .ToList();
 
-                if (newMaster != null)
+            // Calculate how many bots each player should have
+            int botsPerPlayer = allBots.Count / livingPlayers.Count;
+            int extraBots = allBots.Count % livingPlayers.Count;
+
+            // Get current master
+            CharacterMaster currentMaster = this.master.GetComponent<AIOwnership>()?.ownerMaster;
+            
+            // Find the player with the least bots
+            CharacterMaster targetMaster = livingPlayers
+                .OrderBy(p => allBots.Count(b => b.GetComponent<AIOwnership>()?.ownerMaster == p))
+                .First();
+
+            // If current master is dead or we need to rebalance, update ownership
+            if (currentMaster == null || currentMaster.IsDeadAndOutOfLivesServer() || 
+                allBots.Count(b => b.GetComponent<AIOwnership>()?.ownerMaster == currentMaster) > 
+                botsPerPlayer + (extraBots > 0 ? 1 : 0))
+            {
+                // Update the AI ownership to follow the new master
+                AIOwnership aiOwnership = this.master.GetComponent<AIOwnership>();
+                if (aiOwnership != null)
                 {
-                    // Update the AI ownership to follow the new master
-                    AIOwnership aiOwnership = this.master.GetComponent<AIOwnership>();
-                    if (aiOwnership != null)
-                    {
-                        aiOwnership.ownerMaster = newMaster;
-                    }
+                    aiOwnership.ownerMaster = targetMaster;
                 }
             }
         }
@@ -98,9 +112,6 @@ namespace PlayerBots.Custom
             {
                 return;
             }
-
-            // Update master following
-            UpdateMasterFollowing();
 
             // Fix bunny hopping
             this.ai.localNavigator.SetFieldValue("walkFrustration", 0f);
@@ -164,6 +175,15 @@ namespace PlayerBots.Custom
             ProcessEquipment();
             // Run skill helper callback
             this.skillHelper.OnFixedUpdate();
+
+            // Check personal space if we have a PlayerBotBaseAI
+            if (this.ai is PlayerBotBaseAI playerBotAI)
+            {
+                playerBotAI.CheckPersonalSpace();
+            }
+
+            // Update master following
+            UpdateMasterFollowing();
         }
 
         public void InfiniteTowerRunLogic() 

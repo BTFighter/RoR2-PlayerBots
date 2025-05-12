@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("BANDITRELOADEDBODY")]
-    [CustomSurvivor("https://thunderstore.io/package/Dragonyck/BanditReloaded/", "4.1.3")]
+    [CustomSurvivor("https://thunderstore.io/package/Dragonyck/BanditReloaded/", "4.1.4")]
     class BanditReloadedHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

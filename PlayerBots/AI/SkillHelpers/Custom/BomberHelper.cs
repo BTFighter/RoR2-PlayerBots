@@ -5,7 +5,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers
 {
     [SkillHelperSurvivor("DragonBomberBody")]
-    [CustomSurvivor("https://thunderstore.io/package/Dragonyck/Bomber/", "1.4.0")]
+    [CustomSurvivor("https://thunderstore.io/package/Dragonyck/Bomber/", "1.4.1")]
     class BomberHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

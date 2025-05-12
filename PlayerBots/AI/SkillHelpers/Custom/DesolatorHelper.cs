@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("DesolatorBody")]
-    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/Red_Alert/", "3.2.1")]
+    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/Red_Alert/", "3.2.3")]
     class DesolatorHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

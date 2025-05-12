@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace PlayerBots.AI.SkillHelpers
 {
-    [SkillHelperSurvivor("Prefabs/CharacterBodies/RoR1ChefBody")]
-    [CustomSurvivor("https://thunderstore.io/package/LuaFubuki/BackupSquad/", "0.0.3")]
+    [SkillHelperSurvivor("GnomeChefBody")]
+    [CustomSurvivor("https://thunderstore.io/package/Gnome/ChefMod/", "2.3.10")]
     class ChefModHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
@@ -61,6 +61,24 @@ namespace PlayerBots.AI.SkillHelpers
             skill3.resetCurrentEnemyOnNextDriverSelection = false;
             skill3.noRepeat = false;
             skill3.shouldSprint = true;
+
+            AISkillDriver skill3def = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            skill3def.customName = "UtilityOffensive";
+            skill3def.skillSlot = RoR2.SkillSlot.Utility;
+            skill3def.requireSkillReady = true;
+            skill3def.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            skill3def.minDistance = 5;
+            skill3def.maxDistance = 40;
+            skill3def.maxUserHealthFraction = .3f;
+            skill3def.selectionRequiresTargetLoS = true;
+            skill3def.activationRequiresTargetLoS = false;
+            skill3def.activationRequiresAimConfirmation = false;
+            skill3def.movementType = AISkillDriver.MovementType.FleeMoveTarget;
+            skill3def.aimType = AISkillDriver.AimType.MoveDirection;
+            skill3def.ignoreNodeGraph = true;
+            skill3def.resetCurrentEnemyOnNextDriverSelection = false;
+            skill3def.noRepeat = false;
+            skill3def.shouldSprint = true;
 
             // Skills
             AISkillDriver skill1 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;

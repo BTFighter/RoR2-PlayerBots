@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("WidowmakerBody")]
-    [CustomSurvivor("https://thunderstore.io/package/Team_Pepega/Widowmaker/", "1.0.0")]
+    [CustomSurvivor("https://thunderstore.io/package/DragonycksModdingComms/Widowmaker/", "1.0.3")]
     class WidowmakerHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

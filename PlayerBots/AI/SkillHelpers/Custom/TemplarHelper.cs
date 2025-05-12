@@ -4,7 +4,7 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("Templar_Survivor")]
-    [CustomSurvivor("https://thunderstore.io/package/prodzpod/TemplarReturnsReturns/", "1.3.0")]
+    [CustomSurvivor("https://thunderstore.io/package/prodzpod/TemplarReturnsReturns/", "1.3.1")]
     class TemplarHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)

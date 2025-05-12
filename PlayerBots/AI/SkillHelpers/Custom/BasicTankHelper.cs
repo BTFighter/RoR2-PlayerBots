@@ -4,11 +4,28 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("BasicTankBody")]
-    [CustomSurvivor("https://thunderstore.io/package/CheeseWithHoles/Celestial_War_Tank/", "2.0.1")]
+    [CustomSurvivor("https://thunderstore.io/package/CheeseWithHoles/Celestial_War_Tank/", "2.0.2")]
     class BasicTankHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {
+            AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            skill4.customName = "Special";
+            skill4.skillSlot = RoR2.SkillSlot.Special;
+            skill4.requireSkillReady = true;
+            skill4.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            skill4.minDistance = 0;
+            skill4.maxDistance = 50;
+            skill4.selectionRequiresTargetLoS = false;
+            skill4.activationRequiresTargetLoS = false;
+            skill4.activationRequiresAimConfirmation = true;
+            skill4.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            skill4.aimType = AISkillDriver.AimType.AtMoveTarget;
+            skill4.ignoreNodeGraph = false;
+            skill4.resetCurrentEnemyOnNextDriverSelection = false;
+            skill4.noRepeat = true;
+            skill4.shouldSprint = false;
+
             AISkillDriver skill3_chase = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
             skill3_chase.customName = "UtilityChase";
             skill3_chase.skillSlot = RoR2.SkillSlot.Utility;
@@ -33,7 +50,7 @@ namespace PlayerBots.AI.SkillHelpers.Custom
             skill3.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
             skill3.minDistance = 0;
             skill3.maxDistance = 20;
-            //skill3.maxUserHealthFraction = .25f;
+            skill3.maxUserHealthFraction = .40f;
             skill3.selectionRequiresTargetLoS = true;
             skill3.activationRequiresTargetLoS = false;
             skill3.activationRequiresAimConfirmation = false;
@@ -44,23 +61,6 @@ namespace PlayerBots.AI.SkillHelpers.Custom
             skill3.noRepeat = false;
             skill3.shouldSprint = true;
             skill3.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
-
-            AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            skill4.customName = "Special";
-            skill4.skillSlot = RoR2.SkillSlot.Special;
-            skill4.requireSkillReady = true;
-            skill4.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            skill4.minDistance = 0;
-            skill4.maxDistance = 10;
-            skill4.selectionRequiresTargetLoS = false;
-            skill4.activationRequiresTargetLoS = false;
-            skill4.activationRequiresAimConfirmation = true;
-            skill4.movementType = AISkillDriver.MovementType.StrafeMovetarget;
-            skill4.aimType = AISkillDriver.AimType.AtMoveTarget;
-            skill4.ignoreNodeGraph = false;
-            skill4.resetCurrentEnemyOnNextDriverSelection = false;
-            skill4.noRepeat = true;
-            skill4.shouldSprint = false;
 
             AISkillDriver skill2 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
             skill2.customName = "Secondary";
