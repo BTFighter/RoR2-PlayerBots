@@ -134,7 +134,7 @@ namespace PlayerBots.Custom
             }
             else 
             {
-                // Use interactables
+                // Interactable/teleporter logic
                 if (CanInteract())
                 {
                     // Check if stage has changed
@@ -171,17 +171,18 @@ namespace PlayerBots.Custom
                     ForceCustomSkillDriver();
                 }
             }
-            // Check if bot should use equipment
+            // --- Always run these for all bots ---
             ProcessEquipment();
-            // Run skill helper callback
             this.skillHelper.OnFixedUpdate();
-
-            // Check personal space if we have a PlayerBotBaseAI
-            if (this.ai is PlayerBotBaseAI playerBotAI)
+            // Robust personal space: call for any BaseAI on PlayerBot
+            if (this.master.name == "PlayerBot" && this.ai != null)
             {
-                playerBotAI.CheckPersonalSpace();
+                var method = this.ai.GetType().GetMethod("CheckPersonalSpace");
+                if (method != null)
+                {
+                    method.Invoke(this.ai, null);
             }
-
+            }
             // Update master following
             UpdateMasterFollowing();
         }

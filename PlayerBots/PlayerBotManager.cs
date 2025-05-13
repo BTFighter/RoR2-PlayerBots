@@ -47,8 +47,9 @@ namespace PlayerBots
         public static ConfigEntry<bool> BotsUseInteractables { get; set; }
         public static ConfigEntry<bool> ContinueAfterDeath { get; set; }
         public static ConfigEntry<bool> RespawnAfterWave { get; set; }
-        public static ConfigEntry<bool> ScaleEnemiesWithBots { get; set; }
+        public static ConfigEntry<bool> EnablePseudoPlayerMode { get; set; }
         public static ConfigEntry<bool> ForceDlcBotsAsSummons { get; set; }
+        public static ConfigEntry<bool> BotSacrificeRevive { get; set; }
 
         //
         public static bool allRealPlayersDead;
@@ -79,8 +80,9 @@ namespace PlayerBots
             BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
             //These will be removed when entitlements are actually fixed. Hopefully before Alloyed Collective DLC.
-            ScaleEnemiesWithBots = Config.Bind("Player Mode", "ScaleEnemiesWithBots", true, "When PlayerMode is off or bots that spawn with PlayerMode off (ex. DLC Characters), increments the player count for each bot to let the game scale naturally.");
-            ForceDlcBotsAsSummons = Config.Bind("Player Mode", "ForceDlcBotsAsSummons", true, "When enabled, DLC survivors (Railgunner, Seeker, Void Fiend, Chef, False Son) will always spawn as summons in multiplayer, even if PlayerMode is on.");
+            ForceDlcBotsAsSummons = Config.Bind("Player Mode", "ForceDlcBotsAsSummons", true, "When enabled, DLC survivors (Railgunner, Seeker, Void Fiend, Chef, False Son) will always spawn as summons (bots with PlayerMode off) in multiplayer, even if PlayerMode is on.");
+            EnablePseudoPlayerMode = Config.Bind("Player Mode", "EnablePseudoPlayerMode", true, "Enables pseudo-player mode features for summoned bots: allows spectating and scales enemies with bot count");
+            BotSacrificeRevive = Config.Bind("Player Mode", "BotSacrificeRevive", false, "When a player dies, a summoned bot will die to revive them at the bot's position");
 
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
 

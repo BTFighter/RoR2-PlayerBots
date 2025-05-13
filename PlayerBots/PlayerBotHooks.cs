@@ -155,6 +155,58 @@ namespace PlayerBots
             // Fix custom targets
             On.RoR2.CharacterAI.BaseAI.Target.GetBullseyePosition += Hook_GetBullseyePosition;
 
+            // Bot sacrifice revival
+            if (PlayerBotManager.BotSacrificeRevive.Value)
+            {
+                On.RoR2.CharacterMaster.OnBodyDeath += (orig, self, body) =>
+                {
+                    // Only handle player deaths
+                    if (self.GetBody()?.isPlayerControlled == true && !self.name.Equals("PlayerBot"))
+                    {
+                        // Find a living summoned bot
+                        var summonedBot = CharacterMaster.readOnlyInstancesList
+                            .FirstOrDefault(m => 
+                                m.name.Equals("PlayerBot") && 
+                                !m.IsDeadAndOutOfLivesServer() && 
+                                !m.GetComponent<PlayerCharacterMasterController>() &&
+                                // Don't sacrifice Seeker if there are other players/bots alive
+                                !(m.GetBody()?.bodyIndex == BodyCatalog.FindBodyIndex("Seeker") && 
+                                  (NetworkUser.readOnlyInstancesList.Count(u => !u.master.IsDeadAndOutOfLivesServer()) > 1 ||
+                                   CharacterMaster.readOnlyInstancesList.Count(m2 => 
+                                       m2.name.Equals("PlayerBot") && 
+                                       !m2.IsDeadAndOutOfLivesServer() && 
+                                       m2.GetComponent<PlayerCharacterMasterController>() != null) > 0)));
+
+                        if (summonedBot != null)
+                        {
+                            // Get bot's position before killing it
+                            Vector3 botPosition = summonedBot.GetBody().transform.position;
+                            Quaternion botRotation = summonedBot.GetBody().transform.rotation;
+
+                            // Kill the bot
+                            summonedBot.TrueKill();
+
+                            // Delay respawn by 1 second
+                            self.StartCoroutine(DelayedRespawn(self, botPosition, botRotation));
+                            return;
+                        }
+                    }
+                    orig(self, body);
+                };
+            }
+
+            // Spectator fix - moved outside PlayerMode check to work for clients
+            On.RoR2.CameraRigControllerSpectateControls.CanUserSpectateBody += (orig, viewer, body) =>
+            {
+                if (body.master && body.master.name.Equals("PlayerBot"))
+                {
+                    Debug.Log($"[PlayerBots] CanUserSpectateBody called for PlayerBot: EnablePseudoPlayerMode={PlayerBotManager.EnablePseudoPlayerMode.Value}, PlayerMode={PlayerBotManager.PlayerMode.Value}");
+                    if (PlayerBotManager.PlayerMode.Value || PlayerBotManager.EnablePseudoPlayerMode.Value)
+                        return true; // Force allow for debugging
+                }
+                return body.isPlayerControlled || orig(viewer, body);
+            };
+
             // Player mode
             if (PlayerBotManager.PlayerMode.Value)
             {
@@ -232,12 +284,6 @@ namespace PlayerBots
                     c.EmitDelegate<Func<bool, bool>>(x => false);
                 };
 
-                // Spectator fix
-                On.RoR2.CameraRigControllerSpectateControls.CanUserSpectateBody += (orig, viewer, body) =>
-                {
-                    return body.isPlayerControlled || orig(viewer, body);
-                };
-
                 // Dont end game on dying
                 if (PlayerBotManager.ContinueAfterDeath.Value)
                 {
@@ -250,7 +296,7 @@ namespace PlayerBots
                     };
                 }
             }
-            else if (PlayerBotManager.ScaleEnemiesWithBots.Value)
+            else if (PlayerBotManager.EnablePseudoPlayerMode.Value)
             {
                 // Increment player count for each bot when PlayerMode is off
                 On.RoR2.Run.FixedUpdate += (orig, self) =>
@@ -277,6 +323,12 @@ namespace PlayerBots
         {
             orig(self, out position);
             return true;
+        }
+
+        private static System.Collections.IEnumerator DelayedRespawn(CharacterMaster master, Vector3 position, Quaternion rotation)
+        {
+            yield return new WaitForSeconds(1f);
+            master.Respawn(position, rotation);
         }
 
     }
