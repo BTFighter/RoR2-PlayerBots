@@ -92,7 +92,11 @@ namespace PlayerBots
             if (this.master.money >= price)
             {
                 Buy(this.nextChestTier);
-                this.master.money -= price;
+                SurvivorIndex index;
+                if (!PlayerBotUtils.TryGetSurvivorIndexByBodyPrefabName("RobomandoBody", out index) || this.master.GetBody().bodyIndex != BodyCatalog.FindBodyIndex("RobomandoBody"))
+                {
+                    this.master.money -= price;
+                }
                 this.purchases++;
                 ResetChest();
             }

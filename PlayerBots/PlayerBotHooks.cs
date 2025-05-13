@@ -250,6 +250,27 @@ namespace PlayerBots
                     };
                 }
             }
+            else if (PlayerBotManager.ScaleEnemiesWithBots.Value)
+            {
+                // Increment player count for each bot when PlayerMode is off
+                On.RoR2.Run.FixedUpdate += (orig, self) =>
+                {
+                    orig(self);
+                    if (!PlayerBotManager.PlayerMode.Value)
+                    {
+                        // Count only bots that are spawned as summons (not in PlayerMode)
+                        int botCount = CharacterMaster.readOnlyInstancesList.Count(m => 
+                            m.name.Equals("PlayerBot") && 
+                            !m.IsDeadAndOutOfLivesServer() && 
+                            !m.GetComponent<PlayerCharacterMasterController>());
+                        
+                        if (botCount > 0)
+                        {
+                            self.SetFieldValue("livingPlayerCount", self.GetFieldValue<int>("livingPlayerCount") + botCount);
+                        }
+                    }
+                };
+            }
         }
 
         public static bool Hook_GetBullseyePosition(orig_GetBullseyePosition orig, global::RoR2.CharacterAI.BaseAI.Target self, out Vector3 position)
