@@ -25,7 +25,7 @@ A fork of a mod for Risk of Rain 2...
 [Nemesis Mercenary](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/)  
 [Pathfinder](https://thunderstore.io/package/Bog/Pathfinder/)  
 [Pilot](https://thunderstore.io/package/EnforcerGang/Pilot/)  
-[Ravager](https://thunderstore.io/package/rob_gaming/Ravager/)  
+[Ravager](https://thunderstore.io/package/public_ParticleSystem/Ravager/)   
 [Robomando](https://thunderstore.io/c/riskofrain2/p/The_Bozos/RobomandoMod/)  
 [Rocket](https://thunderstore.io/package/EnforcerGang/Rocket/)   
 [Rocket (Raccoon)](https://thunderstore.io/package/VCR/RocketRaccoon/)  
