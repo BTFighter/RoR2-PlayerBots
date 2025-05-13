@@ -78,8 +78,8 @@ namespace PlayerBots
             DontScaleInteractables = Config.Bind("Player Mode", "DontScaleInteractables", true, "Prevents interactables spawn count from scaling with bots. Only active is PlayerMode is true.");
             BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
-            ScaleEnemiesWithBots = Config.Bind("Player Mode", "ScaleEnemiesWithBots", true, "When PlayerMode is off, increments the player count for each bot to let the game scale naturally.");
-            //This will be removed when entitlements are actually fixed. Hopefully before Alloyed Collective DLC.
+            //These will be removed when entitlements are actually fixed. Hopefully before Alloyed Collective DLC.
+            ScaleEnemiesWithBots = Config.Bind("Player Mode", "ScaleEnemiesWithBots", true, "When PlayerMode is off or bots that spawn with PlayerMode off (ex. DLC Characters), increments the player count for each bot to let the game scale naturally.");
             ForceDlcBotsAsSummons = Config.Bind("Player Mode", "ForceDlcBotsAsSummons", true, "When enabled, DLC survivors (Railgunner, Seeker, Void Fiend, Chef, False Son) will always spawn as summons in multiplayer, even if PlayerMode is on.");
 
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
