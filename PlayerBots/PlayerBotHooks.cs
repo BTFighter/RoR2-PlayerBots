@@ -2,6 +2,7 @@
 using RoR2;
 using System;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 using static On.RoR2.CharacterAI.BaseAI.Target;
@@ -224,13 +225,28 @@ namespace PlayerBots
                     orig(self);
                 };
 
-                IL.RoR2.UI.AllyCardManager.PopulateCharacterDataSet += il =>
+                try
+                {
+                    Type ilAllyCardManager = typeof(IL.RoR2.UI.AllyCardManager);
+                    EventInfo populateEvent = ilAllyCardManager.GetEvent("PopulateCharacterDataSet", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (populateEvent != null)
+                    {
+                        MonoMod.Cil.ILContext.Manipulator manipulator = il =>
                 {
                     ILCursor c = new ILCursor(il);
                     c.GotoNext(x => x.MatchCallvirt<CharacterMaster>("get_playerCharacterMasterController"));
                     c.Index += 2;
                     c.EmitDelegate<Func<bool, bool>>(x => false);
                 };
+
+                        MethodInfo addMethod = populateEvent.GetAddMethod(true); // true for non-public
+                        addMethod.Invoke(null, new object[] { manipulator });
+                    }
+                }
+                catch (Exception e)
+                {
+                    PlayerBots.PlayerBotManager.BotLogger.LogError("Failed to apply AllyCardManager hook: " + e);
+                }
 
                 // Dont end game on dying
                 if (PlayerBotManager.ContinueAfterDeath.Value)

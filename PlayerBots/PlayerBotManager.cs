@@ -17,6 +17,8 @@ namespace PlayerBots
     [BepInPlugin("com.meledy.PlayerBots", "PlayerBots", "1.7.1")]
     public class PlayerBotManager : BaseUnityPlugin
     {
+        public static BepInEx.Logging.ManualLogSource BotLogger { get; private set; }
+
         public static System.Random random = new System.Random();
 
         public static List<GameObject> playerbots = new List<GameObject>();
@@ -53,6 +55,8 @@ namespace PlayerBots
 
         public void Awake()
         {
+            BotLogger = Logger;
+
             // Config
             InitialRandomBots = Config.Bind("Starting Bots", "StartingBots.Random", 0, "Starting amount of bots to spawn at the start of a run. (Random)");
 
