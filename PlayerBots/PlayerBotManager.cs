@@ -47,9 +47,6 @@ namespace PlayerBots
         public static ConfigEntry<bool> BotsUseInteractables { get; set; }
         public static ConfigEntry<bool> ContinueAfterDeath { get; set; }
         public static ConfigEntry<bool> RespawnAfterWave { get; set; }
-        public static ConfigEntry<bool> EnablePseudoPlayerMode { get; set; }
-        public static ConfigEntry<bool> ForceDlcBotsAsSummons { get; set; }
-        public static ConfigEntry<bool> BotSacrificeRevive { get; set; }
 
         //
         public static bool allRealPlayersDead;
@@ -79,10 +76,6 @@ namespace PlayerBots
             DontScaleInteractables = Config.Bind("Player Mode", "DontScaleInteractables", true, "Prevents interactables spawn count from scaling with bots. Only active is PlayerMode is true.");
             BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
-            //These will be removed when entitlements are actually fixed. Hopefully before Alloyed Collective DLC.
-            ForceDlcBotsAsSummons = Config.Bind("Player Mode", "ForceDlcBotsAsSummons", true, "When enabled, DLC survivors (Railgunner, Seeker, Void Fiend, Chef, False Son) will always spawn as summons (bots with PlayerMode off) in multiplayer, even if PlayerMode is on.");
-            EnablePseudoPlayerMode = Config.Bind("Player Mode", "EnablePseudoPlayerMode", true, "Enables pseudo-player mode features for summoned bots: allows spectating and scales enemies with bot count");
-            BotSacrificeRevive = Config.Bind("Player Mode", "BotSacrificeRevive", false, "When a player dies, a summoned bot will die to revive them at the bot's position");
 
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
 
@@ -161,19 +154,7 @@ namespace PlayerBots
 
         public static void SpawnPlayerbot(CharacterMaster owner, SurvivorIndex survivorIndex)
         {
-            // Check if this is a DLC survivor that should have PlayerMode forced off
-            bool forcePlayerModeOff = false;
-            string survivorName = SurvivorCatalog.GetSurvivorDef(survivorIndex).cachedName;
-            if (ForceDlcBotsAsSummons.Value && 
-                (survivorName == "Railgunner" || survivorName == "Seeker" || 
-                survivorName == "VoidSurvivor" || survivorName == "Chef" || 
-                survivorName == "FalseSon") && 
-                PlayerCharacterMasterController.instances.Count(p => p.networkUser) > 1)
-            {
-                forcePlayerModeOff = true;
-            }
-
-            if (PlayerMode.Value && !forcePlayerModeOff)
+            if (PlayerMode.Value)
             {
                 SpawnPlayerbotAsPlayer(owner, survivorIndex);
             }
