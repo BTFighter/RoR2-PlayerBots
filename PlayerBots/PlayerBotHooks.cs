@@ -248,6 +248,12 @@ namespace PlayerBots
                     PlayerBots.PlayerBotManager.BotLogger.LogError("Failed to apply AllyCardManager hook: " + e);
                 }
 
+                // Spectator fix
+                On.RoR2.CameraRigControllerSpectateControls.CanUserSpectateBody += (orig, viewer, body) =>
+                {
+                    return body.isPlayerControlled || orig(viewer, body);
+                };
+
                 // Dont end game on dying
                 if (PlayerBotManager.ContinueAfterDeath.Value)
                 {

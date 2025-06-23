@@ -515,10 +515,19 @@ namespace PlayerBots
             }
 
             int characterType = 0;
-            if (args.userArgs.Count > 0)
+            bool useRandom = false;
+            if (args.userArgs.Count == 0)
+            {
+                useRandom = true;
+            }
+            else if (args.userArgs.Count > 0)
             {
                 string classString = args.userArgs[0];
-                if (!Int32.TryParse(classString, out characterType))
+                if (classString.ToLower() == "random")
+                {
+                    useRandom = true;
+                }
+                else if (!Int32.TryParse(classString, out characterType))
                 {
                     SurvivorIndex index;
                     if (SurvivorDict.TryGetValue(classString.ToLower(), out index))
@@ -564,7 +573,27 @@ namespace PlayerBots
                 return;
             }
 
-            SpawnPlayerbots(user.master, (SurvivorIndex)characterType, amount);
+            if (useRandom)
+            {
+                if (RandomSurvivorsList.Count == 0)
+                {
+                    Debug.LogWarning("No random survivors available, defaulting to Bandit.");
+                    SpawnPlayerbots(user.master, (SurvivorIndex)0, amount);
+                }
+                else
+                {
+                    var rand = new System.Random();
+                    for (int i = 0; i < amount; i++)
+                    {
+                        int randomIndex = rand.Next(0, RandomSurvivorsList.Count);
+                        SpawnPlayerbots(user.master, RandomSurvivorsList[randomIndex], 1);
+                    }
+                }
+            }
+            else
+            {
+                SpawnPlayerbots(user.master, (SurvivorIndex)characterType, amount);
+            }
 
             Debug.Log(user.userName + " spawned " + amount + " bots for " + user.userName);
         }
