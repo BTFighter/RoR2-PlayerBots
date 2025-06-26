@@ -82,21 +82,23 @@ namespace PlayerBots
                 return;
             }
 
-            // Max purchases for this map reached
-            if (this.purchases >= this.maxPurchases)
+            // Only apply purchase cap to non-Robomando bots
+            bool isRobomando = this.master.GetBody() && this.master.GetBody().bodyIndex == BodyCatalog.FindBodyIndex("RobomandoBody");
+            if (!isRobomando && this.purchases >= this.maxPurchases)
             {
                 return;
             }
 
             uint price = (uint)this.nextChestPrice;
+            // Apply 40% discount for Robomando
+            if (isRobomando)
+            {
+                price = (uint)Mathf.CeilToInt(this.nextChestPrice * 0.6f);
+            }
             if (this.master.money >= price)
             {
                 Buy(this.nextChestTier);
-                SurvivorIndex index;
-                if (!PlayerBotUtils.TryGetSurvivorIndexByBodyPrefabName("RobomandoBody", out index) || this.master.GetBody().bodyIndex != BodyCatalog.FindBodyIndex("RobomandoBody"))
-                {
-                    this.master.money -= price;
-                }
+                this.master.money -= price;
                 this.purchases++;
                 ResetChest();
             }

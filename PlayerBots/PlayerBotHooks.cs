@@ -1,6 +1,7 @@
 ﻿using MonoMod.Cil;
 using RoR2;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace PlayerBots
 {
     class PlayerBotHooks
     {
+        // Track which Seekers have revived this stage (per-Seeker restriction)
+        private static Dictionary<UnityEngine.Networking.NetworkInstanceId, int> seekerReviveStages = new Dictionary<UnityEngine.Networking.NetworkInstanceId, int>();
         public static void AddHooks()
         {
             // Ugh.
@@ -266,6 +269,70 @@ namespace PlayerBots
                     };
                 }
             }
+
+            // --- Seeker revive PlayerBots hook ---
+            // Patch SeekerController.UnlockGateEffects to also revive PlayerBots
+            // Restrict to once per stage
+            On.RoR2.SeekerController.UnlockGateEffects += (orig, self, chakraGate) =>
+            {
+                orig(self, chakraGate);
+
+                // Only run on server
+                if (!UnityEngine.Networking.NetworkServer.active)
+                    return;
+
+                // Only trigger if the Seeker is a player or a bot
+                var seekerBody = self.GetComponent<CharacterBody>();
+                if (seekerBody == null || seekerBody.master == null)
+                    return;
+
+                // Only trigger on full chakra (gate 7, same as vanilla logic)
+                if (chakraGate < 7)
+                    return;
+
+                // Restrict each Seeker to once per stage
+                int currentStage = Run.instance ? Run.instance.stageClearCount : -1;
+                var seekerNetId = self.GetComponent<UnityEngine.Networking.NetworkIdentity>()?.netId ?? UnityEngine.Networking.NetworkInstanceId.Invalid;
+                
+                // Check if this Seeker has already revived this stage
+                if (seekerReviveStages.TryGetValue(seekerNetId, out int lastReviveStage) && lastReviveStage == currentStage)
+                    return;
+                
+                // Mark this Seeker as having revived this stage
+                seekerReviveStages[seekerNetId] = currentStage;
+
+                // Find all dead PlayerBots (not already revived)
+                foreach (var botObj in PlayerBotManager.playerbots.ToArray())
+                {
+                    if (!botObj) continue;
+                    var master = botObj.GetComponent<CharacterMaster>();
+                    if (master == null) continue;
+                    // Revive all dead PlayerBots (each Seeker can revive all dead bots once per stage)
+                    if (master.IsDeadAndOutOfLivesServer())
+                    {
+                        Vector3 pos = master.deathFootPosition;
+                        // Try to find a safe position near the Seeker
+                        if (seekerBody)
+                        {
+                            pos = seekerBody.footPosition + new Vector3(
+                                UnityEngine.Random.Range(-2f, 2f),
+                                0.5f,
+                                UnityEngine.Random.Range(-2f, 2f));
+                        }
+                        master.Respawn(pos, Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f), true);
+                        var body = master.GetBody();
+                        if (body)
+                        {
+                            body.AddTimedBuff(RoR2Content.Buffs.Immune, 3f);
+                            foreach (var esm in body.GetComponents<EntityStateMachine>())
+                                esm.initialStateType = esm.mainStateType;
+                            var effect = LegacyResourcesAPI.Load<GameObject>("Prefabs/NetworkedObjects/TeleporterHealNovaPulse");
+                            if (effect)
+                                EffectManager.SpawnEffect(effect, new EffectData { origin = pos, rotation = body.transform.rotation }, true);
+                        }
+                    }
+                }
+            };
         }
 
         public static bool Hook_GetBullseyePosition(orig_GetBullseyePosition orig, global::RoR2.CharacterAI.BaseAI.Target self, out Vector3 position)
