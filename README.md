@@ -55,7 +55,7 @@ Disabled:
 
 If anybody wants to improve these Custom AI Scripts, you can create a pull request.
 
-Updates are mostly made using Cursor (AI), if you don't like that then you are more than okay to not use it.
+Code is mostly made using Cursor (AI), if you don't like that then you are more than okay to not use it.
 
 ~~I'd also appreciate it if somebody can update this great mod for SOTS.~~  
 Well, it has happened! (Massive thanks to Meledy for still updating this great mod!)  
