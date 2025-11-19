@@ -1,5 +1,7 @@
-﻿using MonoMod.Cil;
+﻿using HG;
+using MonoMod.Cil;
 using RoR2;
+using RoR2.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -158,6 +160,24 @@ namespace PlayerBots
 
             // Fix custom targets
             On.RoR2.CharacterAI.BaseAI.Target.GetBullseyePosition += Hook_GetBullseyePosition;
+
+            On.RoR2.BossGroup.DropRewards += (orig, self) =>
+            {
+                bool shouldFilterBots = ShouldFilterBotsForBossGroup(self);
+                if (shouldFilterBots)
+                {
+                    DropRewardsExcludingBots(self);
+                    return;
+                }
+
+                orig(self);
+            };
+
+            On.RoR2.ShrineColossusAccessBehavior.OnInteraction += (orig, self, interactor) =>
+            {
+                orig(self, interactor);
+                ApplyShrineOfShapingToBots(self);
+            };
 
             // Player mode
             if (PlayerBotManager.PlayerMode.Value)
@@ -339,6 +359,200 @@ namespace PlayerBots
         {
             orig(self, out position);
             return true;
+        }
+
+        private static bool ShouldFilterBotsForBossGroup(BossGroup bossGroup)
+        {
+            if (!NetworkServer.active || bossGroup == null)
+            {
+                return false;
+            }
+
+            if (PlayerBotManager.playerbots.Count == 0)
+            {
+                return false;
+            }
+
+            TeleporterInteraction teleporter = TeleporterInteraction.instance;
+            return teleporter && teleporter.bossGroup == bossGroup;
+        }
+
+        private static void DropRewardsExcludingBots(BossGroup bossGroup)
+        {
+            if (!bossGroup)
+            {
+                return;
+            }
+
+            Run run = Run.instance;
+            if (!run)
+            {
+                Debug.LogError("No valid run instance!");
+                return;
+            }
+
+            Xoroshiro128Plus rng = bossGroup.GetFieldValue<Xoroshiro128Plus>("rng");
+            if (rng == null)
+            {
+                Debug.LogError("RNG is null!");
+                return;
+            }
+
+            int participatingPlayerCount = GetNonBotParticipatingPlayerCount();
+            if (participatingPlayerCount == 0)
+            {
+                return;
+            }
+
+            if (bossGroup.dropPosition)
+            {
+                UniquePickup basePickup = UniquePickup.none;
+                if (bossGroup.dropTable)
+                {
+                    basePickup = bossGroup.dropTable.GeneratePickup(rng);
+                }
+                else
+                {
+                    List<PickupIndex> list = bossGroup.forceTier3Reward ? run.availableTier3DropList : run.availableTier2DropList;
+                    if (list != null && list.Count > 0)
+                    {
+                        basePickup = new UniquePickup(rng.NextElementUniform(list));
+                    }
+                }
+
+                int dropCount = 1 + bossGroup.bonusRewardCount;
+                if (bossGroup.scaleRewardsByPlayerCount)
+                {
+                    dropCount *= participatingPlayerCount;
+                }
+
+                if (dropCount <= 0)
+                {
+                    return;
+                }
+
+                float angle = 360f / dropCount;
+                Vector3 vector = Quaternion.AngleAxis(UnityEngine.Random.Range(0f, 360f), Vector3.up) * (Vector3.up * 40f + Vector3.forward * 5f);
+                Quaternion quaternion = Quaternion.AngleAxis(angle, Vector3.up);
+                List<UniquePickup> bossDrops = bossGroup.GetFieldValue<List<UniquePickup>>("bossDrops");
+                List<PickupDropTable> bossDropTables = bossGroup.GetFieldValue<List<PickupDropTable>>("bossDropTables");
+                bool hasBossDrops = bossDrops != null && bossDrops.Count > 0;
+                bool hasBossTables = bossDropTables != null && bossDropTables.Count > 0;
+
+                for (int i = 0; i < dropCount; i++)
+                {
+                    UniquePickup pickup = basePickup;
+                    if (bossDrops != null && (hasBossDrops || hasBossTables) && rng.nextNormalizedFloat <= bossGroup.bossDropChance)
+                    {
+                        if (hasBossTables)
+                        {
+                            PickupDropTable pickupDropTable = rng.NextElementUniform(bossDropTables);
+                            if (pickupDropTable != null)
+                            {
+                                pickup = pickupDropTable.GeneratePickup(rng);
+                            }
+                        }
+                        else
+                        {
+                            pickup = rng.NextElementUniform(bossDrops);
+                        }
+                    }
+
+                    PickupDropletController.CreatePickupDroplet(pickup, bossGroup.dropPosition.position, vector);
+                    vector = quaternion * vector;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("dropPosition not set for BossGroup! No item will be spawned.");
+            }
+        }
+
+        private static int GetNonBotParticipatingPlayerCount()
+        {
+            int count = 0;
+            foreach (PlayerCharacterMasterController controller in PlayerCharacterMasterController.instances)
+            {
+                if (controller && !IsPlayerBotController(controller))
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private static bool IsPlayerBotController(PlayerCharacterMasterController controller)
+        {
+            if (!controller)
+            {
+                return false;
+            }
+
+            if (controller.name.Equals("PlayerBot", StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            CharacterMaster master = controller.master;
+            return master && master.name.Equals("PlayerBot", StringComparison.Ordinal);
+        }
+
+        private static void ApplyShrineOfShapingToBots(ShrineColossusAccessBehavior shrine)
+        {
+            if (!NetworkServer.active || shrine == null || PlayerBotManager.playerbots.Count == 0)
+            {
+                return;
+            }
+
+            NodeGraph nodeGraph = SceneInfo.instance ? SceneInfo.instance.GetNodeGraph(MapNodeGroup.GraphType.Ground) : null;
+            List<NodeGraph.NodeIndex> nodes = nodeGraph?.FindNodesInRange(shrine.gameObject.transform.position, 10f, 30f, HullMask.Human);
+            bool canUseNodes = nodes != null && nodes.Count > 0;
+
+            foreach (GameObject bot in PlayerBotManager.playerbots.ToArray())
+            {
+                if (!bot)
+                {
+                    PlayerBotManager.playerbots.Remove(bot);
+                    continue;
+                }
+
+                CharacterMaster master = bot.GetComponent<CharacterMaster>();
+                if (!master)
+                {
+                    continue;
+                }
+
+                if (master.IsDeadAndOutOfLivesServer())
+                {
+                    Vector3 position = shrine.transform.position;
+                    if (canUseNodes)
+                    {
+                        NodeGraph.NodeIndex nodeIndex = nodes[UnityEngine.Random.Range(0, nodes.Count)];
+                        nodeGraph.GetNodePosition(nodeIndex, out position);
+                    }
+                    Quaternion rotation = Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+                    master.Respawn(position, rotation, true);
+                    CharacterBody body = master.GetBody();
+                    if (body)
+                    {
+                        body.AddTimedBuff(RoR2Content.Buffs.Immune, 3f);
+                        foreach (EntityStateMachine esm in body.GetComponents<EntityStateMachine>())
+                        {
+                            esm.initialStateType = esm.mainStateType;
+                        }
+                    }
+                    continue;
+                }
+
+                CharacterBody activeBody = master.GetBody();
+                if (!activeBody || activeBody.healthComponent == null || !activeBody.healthComponent.alive)
+                {
+                    continue;
+                }
+
+                activeBody.AddTimedBuff(RoR2Content.Buffs.Immune, 3f);
+                activeBody.AddBuff(DLC2Content.Buffs.ExtraLifeBuff);
+            }
         }
 
     }

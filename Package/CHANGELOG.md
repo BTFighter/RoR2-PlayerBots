@@ -1,0 +1,74 @@
+- **0.0.9.3 (ror2 1.4.0)**
+    - SkillHelpers:
+        - Added Operator
+        - Added Drifter (BETA)
+    - Bots no longer count when the game gives items after a boss is defeated.
+    - Shrine of Shaping now works with bots.
+    - Fixed pb_startingbots command.
+- **0.0.9.2 (ror2 1.3.9)**
+    - Nerfed Robomando
+        - Robomando can no longer give himself free items, instead he can buy items as much as possible if he can afford it.
+        - Has 40% discount when buying items.
+        - Removed giving himself 5 items every stage, giving 3 items to others randomly stays.
+    - Seeker Players and PlayerBots can now revive PlayerBots with Meditate.
+- **0.0.9.1 (ror2 1.3.9)**
+    - Fixed unable to spectate bots with PlayerMode enabled.
+    - Fixed "addbot" command not randomizing survivors.
+- **0.0.8.2 (ror2 1.3.8)**
+    - Backported spectator fix
+    - Nerfed Robomando
+        - Robomando can no longer give himself free items, instead he can buy items as much as possible if he can afford it.
+        - Has 40% discount when buying items.
+        - Removed giving himself 5 items every stage, giving 3 items to others randomly stays.
+    - Seeker Players and PlayerBots can now revive PlayerBots with Meditate.
+- **0.0.9.0 (ror2 1.3.9)**
+	- Fix AllyCardManager error
+- **0.0.8.1 (ror2 1.3.8)**
+	- Reverted "Temporary Solution"
+		- I realized that this was going to bloat the mod, and it would be better to actually fix it instead of hacky workarounds.
+- **0.0.8.0 (ror2 1.3.8)**
+	- Merged "ScaleEnemiesWithBots" and a new config "AllowSpectateSummonedBots" to "EnablePseudoPlayerMode".
+        - "AllowSpectateSummonedBots" allows players to spectate summoned bots.
+    - Added "BotSacrificeRevive"
+        - When a player dies, a summoned bot will die to revive them at the bot's position.
+- **0.0.7.0 (ror2 1.3.8)**
+    - Added configs "ForceDlcBotsAsSummons" and "ScaleEnemiesWithBots"
+        - "ForceDlcBotsAsSummons" makes DLC Survivors always spawn with PlayerMode off. This is a temporary fix for the first issue.
+        - "ScaleEnemiesWithBots" increments the player count for each bot that has PlayerMode off. Highly recommended to be used with "ForceDlcBotsAsSummons".
+    - Exempted Robomando from losing money when buying items.
+- **0.0.6.0 (ror2 1.3.8)**	
+	- SkillHelpers:
+		- Added CHEF (RoR1 version)
+    	- Added Chirr
+    	- Added Belmont
+    	- Added Dancer
+    	- Added Kindred
+    	- Added Robomando
+    	- Adjusted Enforcer
+    	- Adjusted Celestial War Tank
+    - Modified "Master Transfer" to now distribute bots among players evenly.
+    - Fixed "Personal Space" not working.
+    - Modified README. (Some mods are updated)
+    - Updated links and version numbers.
+- **0.0.5.0 (ror2 1.3.7)**
+	- Added Bot Owner Transfer feature, where if a player that a bot is following dies, the bot will follow another player.
+- **0.0.4.0 (ror2 1.3.7)**
+	- Added Rocket (Raccoon).
+	- Fixes Huntress not spawing. (Huntress' AiSkillDriver was empty. Oops.)
+- **0.0.3.0 (ror2 1.3.7)**
+	- Updated to work for latest verison. Massive thanks to @Donniecoe828 for his code.
+	- Added the ff:
+		- Executioner
+		- Nemesis Commando
+		- Nemesis Mercenary
+		- Space Marine
+		- Templar
+	- Disabled the ff:
+		- Builder
+		- Nemesis Enforcer
+		- Seamstress
+- **0.0.2.0 (ror2 1.3.6)**
+	- Updated to PlayerBots v1.7.1, now being able to play with Seekers of the Storm DLC!
+- **0.0.1.0 (ror2 1.2.3.1)**
+	- Initial Release
+	- Added suppor for more custom characters.

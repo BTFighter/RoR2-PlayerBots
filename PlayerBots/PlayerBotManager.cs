@@ -711,44 +711,30 @@ namespace PlayerBots
         [ConCommand(commandName = "pb_startingbots", flags = ConVarFlags.None, helpText = "Set initial bot count [character type] [amount]")]
         private static void CCInitialBot(ConCommandArgs args)
         {
-            int characterType = 0;
-            if (args.userArgs.Count > 0)
-            {
-                string classString = args.userArgs[0];
-                if (!Int32.TryParse(classString, out characterType))
-                {
-                    SurvivorIndex index;
-                    if (SurvivorDict.TryGetValue(classString.ToLower(), out index))
-                    {
-                        characterType = (int)index;
-                    }
-                    else
-                    {
-                        characterType = 0;
-                    }
-                }
-
-                // Clamp
-                characterType = Math.Max(Math.Min(characterType, RandomSurvivorsList.Count - 1), 0);
-            }
-            else
+            if (RandomSurvivorsList.Count == 0 || args.userArgs.Count < 2)
             {
                 return;
             }
 
-            int amount = 0;
-            if (args.userArgs.Count > 1)
+            string survivorToken = args.userArgs[0];
+            if (!TryResolveStartingBotIndex(survivorToken, out int characterType))
             {
-                string amountString = args.userArgs[1];
-                Int32.TryParse(amountString, out amount);
+                Debug.LogWarning($"pb_startingbots: Unable to resolve survivor '{survivorToken}'.");
+                return;
             }
-            else
+
+            if (!Int32.TryParse(args.userArgs[1], out int amount))
             {
                 return;
             }
 
             InitialBots[characterType].Value = amount;
-            Debug.Log("Set StartingBots." + RandomSurvivorsList[characterType].ToString() + " to " + amount);
+
+            SurvivorIndex survivor = RandomSurvivorsList[characterType];
+            BodyIndex bodyIndex = SurvivorCatalog.GetBodyIndexFromSurvivorIndex(survivor);
+            string survivorName = BodyCatalog.GetBodyName(bodyIndex);
+
+            Debug.Log($"Set StartingBots.{survivorName} to {amount}");
         }
 
         [ConCommand(commandName = "pb_startingbots_random", flags = ConVarFlags.None, helpText = "Set initial random bot count [amount]")]
@@ -825,6 +811,51 @@ namespace PlayerBots
 
                 Debug.Log(name + "'s money: " + master.money);
             }
+        }
+
+        private static bool TryResolveStartingBotIndex(string survivorToken, out int characterType)
+        {
+            characterType = 0;
+            if (string.IsNullOrWhiteSpace(survivorToken))
+            {
+                return false;
+            }
+
+            // Allow direct numeric index into RandomSurvivorsList.
+            if (Int32.TryParse(survivorToken, out int numericIndex))
+            {
+                characterType = Mathf.Clamp(numericIndex, 0, RandomSurvivorsList.Count - 1);
+                return true;
+            }
+
+            SurvivorIndex survivorIndex;
+            if (SurvivorDict.TryGetValue(survivorToken.ToLowerInvariant(), out survivorIndex) && TryGetRandomSurvivorListIndex(survivorIndex, out characterType))
+            {
+                return true;
+            }
+
+            if (PlayerBotUtils.TryGetSurvivorIndexByBodyPrefabName(survivorToken, out survivorIndex) && TryGetRandomSurvivorListIndex(survivorIndex, out characterType))
+            {
+                return true;
+            }
+
+            // Try again with "Body" suffix trimming if provided.
+            if (survivorToken.EndsWith("body", StringComparison.OrdinalIgnoreCase))
+            {
+                string trimmed = survivorToken.Substring(0, survivorToken.Length - 4);
+                if (PlayerBotUtils.TryGetSurvivorIndexByBodyPrefabName(trimmed + "Body", out survivorIndex) && TryGetRandomSurvivorListIndex(survivorIndex, out characterType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryGetRandomSurvivorListIndex(SurvivorIndex survivorIndex, out int characterType)
+        {
+            characterType = RandomSurvivorsList.IndexOf(survivorIndex);
+            return characterType >= 0;
         }
 
         [ConCommand(commandName = "pb_listsurvivors", flags = ConVarFlags.None, helpText = "Lists survivor indexes.")]
