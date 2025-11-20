@@ -57,6 +57,6 @@ Disabled:
 If anybody wants to improve these Custom AI Scripts, you can create a pull request.
 
 Works for all DLCs, including Alloyed Collective.
-Check the [main repository](https://github.com/Melledy/RoR2-PlayerBots) for the original mod.
+Check the [original mod](https://thunderstore.io/package/Meledy/PlayerBots/) and it's [Github Repository](https://github.com/Melledy/RoR2-PlayerBots).
 
 DISCLAIMER: This fork uses AI to generate code for fixes/additions.

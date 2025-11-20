@@ -1,4 +1,5 @@
-﻿using HG;
+﻿using EntityStates;
+using HG;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
@@ -178,6 +179,17 @@ namespace PlayerBots
             {
                 orig(self, interactor);
                 ApplyShrineOfShapingToBots(self);
+            };
+
+            On.RoR2.HalcyoniteShrineInteractable.DropRewards += (orig, self) =>
+            {
+                if (ShouldFilterBotsForHalcyonShrine(self))
+                {
+                    DropHalcyonRewardsExcludingBots(self);
+                    return;
+                }
+
+                orig(self);
             };
 
             // Player mode
@@ -524,6 +536,107 @@ namespace PlayerBots
             else
             {
                 Debug.LogWarning("dropPosition not set for BossGroup! No item will be spawned.");
+            }
+        }
+
+        private static bool ShouldFilterBotsForHalcyonShrine(HalcyoniteShrineInteractable shrine)
+        {
+            if (!NetworkServer.active || shrine == null)
+            {
+                return false;
+            }
+
+            return PlayerBotManager.playerbots.Count > 0;
+        }
+
+        private static void DropHalcyonRewardsExcludingBots(HalcyoniteShrineInteractable shrine)
+        {
+            if (!NetworkServer.active || shrine == null)
+            {
+                return;
+            }
+
+            EntityStateMachine stateMachine = shrine.stateMachine;
+            SerializableEntityStateType finishedState = shrine.finishedState;
+            if (stateMachine != null)
+            {
+                stateMachine.SetNextState(EntityStateCatalog.InstantiateState(ref finishedState));
+            }
+
+            BasicPickupDropTable rewardDropTable = shrine.GetFieldValue<BasicPickupDropTable>("rewardDropTable");
+            if (!shrine.gameObject || !rewardDropTable)
+            {
+                return;
+            }
+
+            int participatingPlayerCount = GetNonBotParticipatingPlayerCount();
+            if (participatingPlayerCount <= 0)
+            {
+                return;
+            }
+
+            int quantityIncreaseFromBuyIn = Math.Max(1, shrine.GetFieldValue<int>("quantityIncreaseFromBuyIn"));
+            int dropIterations = participatingPlayerCount * quantityIncreaseFromBuyIn;
+            if (dropIterations <= 0)
+            {
+                return;
+            }
+
+            Vector3 rewardOffset = shrine.GetFieldValue<Vector3>("rewardOffset");
+            int rewardOptionCount = shrine.GetFieldValue<int>("rewardOptionCount");
+            GameObject rewardPickupPrefab = shrine.GetFieldValue<GameObject>("rewardPickupPrefab");
+            ItemTier rewardDisplayTier = shrine.GetFieldValue<ItemTier>("rewardDisplayTier");
+            BasicPickupDropTable halcyoniteDropTableTier3 = shrine.GetFieldValue<BasicPickupDropTable>("halcyoniteDropTableTier3");
+            BasicPickupDropTable halcyoniteDropTableTier2 = shrine.GetFieldValue<BasicPickupDropTable>("halcyoniteDropTableTier2");
+            Xoroshiro128Plus rng = shrine.GetFieldValue<Xoroshiro128Plus>("rng");
+
+            if (rng == null && Run.instance?.treasureRng != null)
+            {
+                rng = new Xoroshiro128Plus(Run.instance.treasureRng.nextUlong);
+                shrine.SetFieldValue("rng", rng);
+            }
+
+            if (rng == null)
+            {
+                Debug.LogWarning("Halcyonite shrine RNG is null; aborting reward drop.");
+                return;
+            }
+
+            float angle = 360f / dropIterations;
+            Vector3 vector = Quaternion.AngleAxis(UnityEngine.Random.Range(0, 360), Vector3.up) * (Vector3.up * 40f + Vector3.forward * 5f);
+            Quaternion quaternion = Quaternion.AngleAxis(angle, Vector3.up);
+            Vector3 position = shrine.gameObject.transform.position + rewardOffset;
+
+            for (int i = 0; i < dropIterations; i++)
+            {
+                if (HalcyoniteShrineInteractable.isCommandEnabled)
+                {
+                    int commandDrops = Mathf.Max(0, rewardOptionCount - 2);
+                    for (int j = 0; j < commandDrops; j++)
+                    {
+                        UniquePickup pickup = rewardDropTable.GeneratePickup(rng);
+                        GenericPickupController.CreatePickupInfo pickupInfo = new GenericPickupController.CreatePickupInfo
+                        {
+                            pickup = pickup,
+                            rotation = Quaternion.identity,
+                            position = position
+                        };
+                        PickupDropletController.CreatePickupDroplet(pickupInfo, pickupInfo.position, vector);
+                    }
+                }
+                else
+                {
+                    PickupDropletController.CreatePickupDroplet(new GenericPickupController.CreatePickupInfo
+                    {
+                        pickup = new UniquePickup(PickupCatalog.FindPickupIndex(rewardDisplayTier)),
+                        pickerOptions = PickupPickerController.GenerateOptionsFromDropTablePlusForcedStorm(rewardOptionCount, halcyoniteDropTableTier3, halcyoniteDropTableTier2, rng),
+                        rotation = Quaternion.identity,
+                        position = position,
+                        prefabOverride = rewardPickupPrefab
+                    }, position, vector);
+                }
+
+                vector = quaternion * vector;
             }
         }
 
