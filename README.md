@@ -55,8 +55,7 @@ Disabled:
 
 If anybody wants to improve these Custom AI Scripts, you can create a pull request.
 
-Code is mostly made using Cursor (AI), if you don't like that then you are more than okay to not use it.
+Works for all DLCs, including Alloyed Collective.
+Check the [main repository](https://github.com/Melledy/RoR2-PlayerBots) for the original mod.
 
-~~I'd also appreciate it if somebody can update this great mod for SOTS.~~  
-Well, it has happened! (Massive thanks to Meledy for still updating this great mod!)  
-Check the [main repository](https://github.com/Melledy/RoR2-PlayerBots) for the original mod, now updated for Seekers of the Storm DLC.
+DISCLAIMER: This fork uses AI to generate code for fixes/additions.
