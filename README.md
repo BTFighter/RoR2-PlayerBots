@@ -1,7 +1,5 @@
 # RoR2-PlayerBots
-A fork of a mod for Risk of Rain 2...  
-
-...with added features and (admittedly low quality) custom character support for:  
+A fork of a mod for Risk of Rain 2 with added features and custom character support for:  
 [Alien Hominid](https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/)  
 [Arsonist](https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/)  
 [Assassin](https://thunderstore.io/package/HasteReapr/AssassinMod/)  
@@ -14,7 +12,7 @@ A fork of a mod for Risk of Rain 2...
 [Chirr](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/)  
 [Dancer](https://thunderstore.io/package/nayDPz/Dancer/)  
 [Deputy](https://thunderstore.io/package/Bog/Deputy/)  
-[Desolator](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
+[Desolator](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) 
 [Driver](https://thunderstore.io/package/public_ParticleSystem/Driver/)  
 [Executioner](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/)  
 [Jhin](https://thunderstore.io/package/SeroRonin/Jhin/)  
@@ -36,19 +34,21 @@ A fork of a mod for Risk of Rain 2...
 [Spy](https://thunderstore.io/package/tsuyoikenko/Spy/)   
 [Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/)   
 [Templar](https://thunderstore.io/package/prodzpod/TemplarReturnsReturns/)  
-[Tesla Trooper](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) ([v0.0.1 version](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/))  
+[Tesla Trooper](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) 
 [Wanderer](https://thunderstore.io/package/tsuyoikenko/Wanderer/)  
 [Widowmaker](https://thunderstore.io/package/DragonycksModdingComms/Widowmaker/)  
-[Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) ([v0.0.1 version](https://thunderstore.io/package/Team_Pepega/Zeri/))  
-
-Characters only for v0.0.1:  
-[RMOR](https://thunderstore.io/package/MoriyaFaith/RMOR_REFORGED/) (Deprecated)  
+[Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) 
 
 Also now supports newer versions of the ff. mods:  
 [Bandit Reloaded](https://thunderstore.io/package/Dragonyck/BanditReloaded/)  
-[Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
+[Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/) 
 
-Disabled:  
+Deprecated characters for older versions: 
+[Desolator & Tesla Trooper](https://thunderstore.io/package/TheTimesweeper/Tesla_Trooper/) (Old version) 
+[RMOR](https://thunderstore.io/package/MoriyaFaith/RMOR_REFORGED/) 
+[Zeri](https://thunderstore.io/package/Team_Pepega/Zeri/) (Old version) 
+
+Disabled for now:
 [Builder](https://thunderstore.io/package/DragonycksModdingComms/Builder/)  
 [Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
 [Seamstress](https://thunderstore.io/package/tsuyoikenko/Seamstress/)  
