@@ -1,4 +1,5 @@
 ﻿using HG;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using RoR2;
 using RoR2.Navigation;
@@ -288,6 +289,10 @@ namespace PlayerBots
                         c.EmitDelegate<Func<bool, bool>>(x => true);
                     };
                 }
+
+                // Ensure bots appear on scoreboards even if mods filter disconnected players
+                IL.RoR2.UI.ScoreboardController.Rebuild += InjectBotsIntoScoreboard;
+
             }
 
             // --- Seeker revive PlayerBots hook ---
@@ -353,6 +358,60 @@ namespace PlayerBots
                     }
                 }
             };
+        }
+
+        private static void InjectBotsIntoScoreboard(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            if (c.TryGotoNext(MoveType.After, x => x.MatchStloc(0)))
+            {
+                c.Emit(OpCodes.Ldloc_0);
+                c.EmitDelegate<Func<List<PlayerCharacterMasterController>, List<PlayerCharacterMasterController>>>(IncludeBotsInScoreboardList);
+                c.Emit(OpCodes.Stloc_0);
+            }
+            else
+            {
+                PlayerBotManager.BotLogger?.LogWarning("Failed to patch ScoreboardController.Rebuild for bot inclusion.");
+            }
+        }
+
+        private static List<PlayerCharacterMasterController> IncludeBotsInScoreboardList(List<PlayerCharacterMasterController> list)
+        {
+            if (list == null)
+            {
+                return list;
+            }
+
+            foreach (PlayerCharacterMasterController controller in PlayerCharacterMasterController.instances)
+            {
+                if (!controller || list.Contains(controller))
+                {
+                    continue;
+                }
+
+                if (!controller.gameObject || !controller.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                CharacterMaster master = controller.master;
+                if (!master || master.GetBody() == null)
+                {
+                    continue;
+                }
+
+                if (Util.GetBestMasterName(master) == null)
+                {
+                    continue;
+                }
+
+                if (IsPlayerBotController(controller))
+                {
+                    list.Add(controller);
+                }
+            }
+
+            return list;
         }
 
         public static bool Hook_GetBullseyePosition(orig_GetBullseyePosition orig, global::RoR2.CharacterAI.BaseAI.Target self, out Vector3 position)

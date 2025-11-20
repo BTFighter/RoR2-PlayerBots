@@ -276,6 +276,7 @@ namespace PlayerBots
             Destroy(card);
         }
 
+
         private static void SpawnPlayerbotAsSummon(CharacterMaster owner, SurvivorIndex survivorIndex)
         {
             SurvivorDef def = SurvivorCatalog.GetSurvivorDef(survivorIndex);

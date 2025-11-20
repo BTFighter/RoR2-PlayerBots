@@ -22,6 +22,8 @@ namespace PlayerBots.Custom
 
         // Cached variables
         private AISkillDriver customTargetSkillDriver;
+        private float defaultCustomTargetMinDistance = 5f;
+        private bool leashDistanceOverriddenThisTick;
         private StageCache stageCache;
         private InfiniteTowerRun infiniteTowerRun;
         private int infiniteTowerWave;
@@ -48,6 +50,7 @@ namespace PlayerBots.Custom
 
             if (ai is PlayerBotBaseAI) {
                 customTargetSkillDriver = ai.skillDrivers.First(driver => driver.customName.Equals("CustomTargetLeash"));
+                defaultCustomTargetMinDistance = customTargetSkillDriver ? customTargetSkillDriver.minDistance : defaultCustomTargetMinDistance;
                 body = master.GetBody();
                 bodyInteractor = master.GetBody().GetComponent<Interactor>();
                 this.stageCache = new StageCache();
@@ -113,6 +116,8 @@ namespace PlayerBots.Custom
                 return;
             }
 
+            leashDistanceOverriddenThisTick = false;
+
             // Fix bunny hopping
             this.ai.localNavigator.SetFieldValue("walkFrustration", 0f);
             // Check if body interactor has changed
@@ -152,7 +157,7 @@ namespace PlayerBots.Custom
                     }
                     // Clear
                     this.ai.customTarget.gameObject = null;
-                    this.customTargetSkillDriver.minDistance = 0;
+                    OverrideCustomTargetMinDistance(0f);
                     // Pickups
                     PickupItems();
                     // Check interactables
@@ -164,13 +169,19 @@ namespace PlayerBots.Custom
                 {
                     // Clear
                     this.ai.customTarget.gameObject = null;
-                    this.customTargetSkillDriver.minDistance = 0;
+                    OverrideCustomTargetMinDistance(0f);
                     // Force bot to use teleporter after player dies
                     CheckTeleporter();
                     // Force custom skill driver if not in combat
                     ForceCustomSkillDriver();
                 }
             }
+
+            if (!leashDistanceOverriddenThisTick)
+            {
+                ResetCustomTargetMinDistance();
+            }
+
             // Check if bot should use equipment
             ProcessEquipment();
             // Run skill helper callback
@@ -204,11 +215,32 @@ namespace PlayerBots.Custom
             }
             // Clear
             this.ai.customTarget.gameObject = null;
-            this.customTargetSkillDriver.minDistance = 0;
+            OverrideCustomTargetMinDistance(0f);
             if (safeWardController) 
             {
                 this.ai.customTarget.gameObject = safeWardController.gameObject;
             }
+        }
+
+        private void OverrideCustomTargetMinDistance(float value)
+        {
+            if (!customTargetSkillDriver)
+            {
+                return;
+            }
+
+            customTargetSkillDriver.minDistance = value;
+            leashDistanceOverriddenThisTick = true;
+        }
+
+        private void ResetCustomTargetMinDistance()
+        {
+            if (!customTargetSkillDriver)
+            {
+                return;
+            }
+
+            customTargetSkillDriver.minDistance = defaultCustomTargetMinDistance;
         }
 
         public void PickupItems()
@@ -326,7 +358,7 @@ namespace PlayerBots.Custom
                 if (TeleporterInteraction.instance.isCharging)
                 {
                     this.ai.customTarget.gameObject = TeleporterInteraction.instance.gameObject;
-                    this.customTargetSkillDriver.minDistance = TeleporterInteraction.instance.holdoutZoneController.currentRadius;
+                    OverrideCustomTargetMinDistance(TeleporterInteraction.instance.holdoutZoneController.currentRadius);
                 }
                 if (TeleporterInteraction.instance.isIdle || (TeleporterInteraction.instance.isCharged && PlayerBotManager.allRealPlayersDead))
                 {
@@ -338,6 +370,7 @@ namespace PlayerBots.Custom
                     }
                     // Move to teleporter
                     this.ai.customTarget.gameObject = TeleporterInteraction.instance.gameObject;
+                    OverrideCustomTargetMinDistance(0f);
                     return true;
                 }
             }

@@ -1,3 +1,7 @@
+- **0.9.4 (ror2 1.4.0)**
+    - Simplified version numbering, starting from v0.9.3
+    - Fixed WolfoQOL mod incompatability related to the scoreboard.
+    - Fixed Personal Space not respected after reviving.
 - **0.9.3 (ror2 1.4.0)**
     - SkillHelpers:
         - Added Operator
