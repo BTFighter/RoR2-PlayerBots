@@ -1,4 +1,5 @@
 # RoR2-PlayerBots
+
 A fork of a mod for Risk of Rain 2...  
 
 ...with added features and (admittedly low quality) custom character support for:  
@@ -55,6 +56,7 @@ Disabled:
 
 If anybody wants to improve these Custom AI Scripts, you can create a pull request.
 
-~~I'd also appreciate it if somebody can update this great mod for SOTS.~~  
-Well, it has happened! (Massive thanks to Meledy for still updating this great mod!)  
-Check the [main repository](https://github.com/Melledy/RoR2-PlayerBots) for the original mod, now updated for Seekers of the Storm DLC.
+Works for all DLCs, including Alloyed Collective.
+Check the [main repository](https://github.com/Melledy/RoR2-PlayerBots) for the original mod.
+
+DISCLAIMER: This fork uses AI to generate code for fixes/additions.
