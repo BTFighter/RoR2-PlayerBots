@@ -40,7 +40,8 @@ A fork of a mod for Risk of Rain 2 with added features and custom character supp
 [Widowmaker](https://thunderstore.io/package/DragonycksModdingComms/Widowmaker/)  
 [Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/)
 
-Credits:
-Meledy - for the [original PlayerBots](https://thunderstore.io/package/Meledy/PlayerBots/) mod.
+Credits:  
+Meledy - for the [original PlayerBots](https://thunderstore.io/package/Meledy/PlayerBots/) mod. 
+.score - for [LemurFusion](https://thunderstore.io/package/score/LemurFusion/), used for the teleportation feature and VFX.
 
 DISCLAIMER: This fork uses AI to generate code for fixes/additions.

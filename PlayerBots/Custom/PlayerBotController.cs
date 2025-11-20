@@ -108,6 +108,51 @@ namespace PlayerBots.Custom
             }
         }
 
+        private void CheckTeleportToMaster()
+        {
+            // Skip if teleportation is disabled
+            if (PlayerBotManager.BotTeleportDistance.Value <= 0f)
+                return;
+
+            // Skip if no body or bot is dead
+            if (!this.body || this.master.IsDeadAndOutOfLivesServer())
+                return;
+
+            // Get the master player this bot follows
+            AIOwnership aiOwnership = this.master.GetComponent<AIOwnership>();
+            if (aiOwnership == null || aiOwnership.ownerMaster == null)
+                return;
+
+            CharacterMaster masterPlayer = aiOwnership.ownerMaster;
+            
+            // Skip if master player is dead
+            if (masterPlayer.IsDeadAndOutOfLivesServer())
+                return;
+
+            CharacterBody masterBody = masterPlayer.GetBody();
+            if (masterBody == null)
+                return;
+
+            // Calculate distance squared (using squared distance for performance)
+            float teleportDistanceSq = PlayerBotManager.BotTeleportDistance.Value * PlayerBotManager.BotTeleportDistance.Value;
+            Vector3 botPosition = this.body.transform.position;
+            Vector3 masterPosition = masterBody.transform.position;
+            float distanceSq = (botPosition - masterPosition).sqrMagnitude;
+
+            // Teleport if too far away
+            if (distanceSq > teleportDistanceSq)
+            {
+                // Spawn teleport effect at destination (before teleporting)
+                GameObject teleportEffectPrefab = Run.instance.GetTeleportEffectPrefab(this.body.gameObject);
+                if (teleportEffectPrefab)
+                {
+                    EffectManager.SimpleEffect(teleportEffectPrefab, masterPosition, Quaternion.identity, transmit: true);
+                }
+
+                TeleportHelper.TeleportGameObject(this.body.gameObject, masterPosition);
+            }
+        }
+
         public void FixedUpdate()
         {
             // Skip if no body object or if bot is dead
@@ -195,6 +240,9 @@ namespace PlayerBots.Custom
 
             // Update master following
             UpdateMasterFollowing();
+
+            // Check if bot should teleport to master player
+            CheckTeleportToMaster();
         }
 
         public void InfiniteTowerRunLogic() 

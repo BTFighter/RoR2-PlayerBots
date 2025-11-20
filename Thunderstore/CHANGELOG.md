@@ -1,3 +1,8 @@
+- **0.9.5 (ror2 1.4.0)**
+	- Bots now teleport to players if they are too far away.
+        - Can be adjusted in the config. Set to 0 to disable this feature.
+    - Game no longer count bots when giving Aurelionite Fragments.
+	- Bots no longer buy scrap. (Hopefully)
 - **0.9.4 (ror2 1.4.0)**
     - Simplified version numbering, starting from v0.9.3
     - Fixed WolfoQOL mod incompatability related to the scoreboard.

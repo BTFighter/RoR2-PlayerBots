@@ -129,7 +129,14 @@ namespace PlayerBots
             // Pickup
             if (dropList != null && dropList.Count > 0)
             {
-                PickupIndex dropPickup = Run.instance.treasureRng.NextElementUniform<PickupIndex>(dropList);
+                List<PickupIndex> filteredDropList = dropList.Where((PickupIndex pickupIndex) => !IsScrapPickup(pickupIndex)).ToList();
+                if (filteredDropList.Count == 0)
+                {
+                    // No valid (non-scrap) pickups available, so abort the purchase
+                    return;
+                }
+
+                PickupIndex dropPickup = Run.instance.treasureRng.NextElementUniform<PickupIndex>(filteredDropList);
                 PickupDef pickup = PickupCatalog.GetPickupDef(dropPickup);
                 if (pickup.itemIndex != ItemIndex.None)
                 {
@@ -165,6 +172,29 @@ namespace PlayerBots
             WHITE = 0,
             GREEN = 1,
             RED = 2
+        }
+
+        private static bool IsScrapPickup(PickupIndex pickupIndex)
+        {
+            PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+            if (pickupDef == null)
+            {
+                return false;
+            }
+
+            ItemIndex itemIndex = pickupDef.itemIndex;
+            if (itemIndex == ItemIndex.None)
+            {
+                return false;
+            }
+
+            ItemDef itemDef = ItemCatalog.GetItemDef(itemIndex);
+            if (itemDef == null)
+            {
+                return false;
+            }
+
+            return itemDef.ContainsTag(ItemTag.Scrap) || itemDef.ContainsTag(ItemTag.PriorityScrap);
         }
     }
 }

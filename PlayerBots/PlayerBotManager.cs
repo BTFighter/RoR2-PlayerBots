@@ -49,6 +49,7 @@ namespace PlayerBots
         public static ConfigEntry<bool> BotsUseInteractables { get; set; }
         public static ConfigEntry<bool> ContinueAfterDeath { get; set; }
         public static ConfigEntry<bool> RespawnAfterWave { get; set; }
+        public static ConfigEntry<float> BotTeleportDistance { get; set; }
 
         //
         public static bool allRealPlayersDead;
@@ -82,6 +83,8 @@ namespace PlayerBots
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
 
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
+
+            BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
 
             // Sanity check
             MaxBuyingDelay.Value = Math.Max(MaxBuyingDelay.Value, MinBuyingDelay.Value);
