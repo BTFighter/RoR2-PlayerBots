@@ -1,6 +1,6 @@
 {
     "name": "PlayerBotsFork",
-    "version_number": "0.9.5",
+    "version_number": "0.9.6",
     "website_url": "https://github.com/BTFighter/RoR2-PlayerBots",
     "description": "Fork of PlayerBots. Adds AI controlled teammates to your game.",
     "dependencies": [
