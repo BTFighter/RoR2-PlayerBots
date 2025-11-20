@@ -48,7 +48,7 @@ Deprecated characters for older versions:
 [Templar](https://thunderstore.io/package/prodzpod/TemplarReturnsReturns/)  
 [Zeri](https://thunderstore.io/package/Team_Pepega/Zeri/) (Old version)  
 
-Disabled for now:
+Disabled for now:  
 [Builder](https://thunderstore.io/package/DragonycksModdingComms/Builder/)  
 [Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
 [Seamstress](https://thunderstore.io/package/tsuyoikenko/Seamstress/)  

@@ -1,6 +1,6 @@
 # RoR2-PlayerBots
 
-A fork of a mod for Risk of Rain 2 with added features and custom character support.  
+A fork of a mod for Risk of Rain 2 with added features and more custom character support.  
 
 
 <details>

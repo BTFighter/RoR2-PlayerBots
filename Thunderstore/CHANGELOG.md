@@ -1,3 +1,5 @@
+- **0.9.6 (ror2 1.4.0)**
+	- Thunderstore page rework.
 - **0.9.5 (ror2 1.4.0)**
 	- Bots now teleport to players if they are too far away.
         - Can be adjusted in the config. Set to 0 to disable this feature.
