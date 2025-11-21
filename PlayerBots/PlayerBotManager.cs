@@ -50,6 +50,9 @@ namespace PlayerBots
         public static ConfigEntry<bool> ContinueAfterDeath { get; set; }
         public static ConfigEntry<bool> RespawnAfterWave { get; set; }
         public static ConfigEntry<float> BotTeleportDistance { get; set; }
+        public static ConfigEntry<bool> EnableDroneSupport { get; set; }
+
+        public static ConfigEntry<bool> EnableDroneSupportAllBots { get; set; }
 
         //
         public static bool allRealPlayersDead;
@@ -85,6 +88,8 @@ namespace PlayerBots
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
 
             BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
+            EnableDroneSupport = Config.Bind("Player Mode", "EnableDroneSupport", true, "Allow Operator bots to purchase support drones.");
+            EnableDroneSupportAllBots = Config.Bind("Player Mode", "EnableDroneSupportAllBots", false, "Allow all bots to purchase support drones. EnableDroneSupport must be enabled.");
 
             // Sanity check
             MaxBuyingDelay.Value = Math.Max(MaxBuyingDelay.Value, MinBuyingDelay.Value);
@@ -261,6 +266,8 @@ namespace PlayerBots
                     ItemManager itemManager = gameObject.AddComponent<ItemManager>() as ItemManager;
                 }
 
+                MaybeAttachOperatorDroneSupport(gameObject, bodyPrefab);
+
                 // Add to playerbot list
                 playerbots.Add(gameObject);
             };
@@ -365,6 +372,8 @@ namespace PlayerBots
                     ItemManager itemManager = gameObject.AddComponent<ItemManager>() as ItemManager;
                 }
 
+                MaybeAttachOperatorDroneSupport(gameObject, bodyPrefab);
+
                 // Add to playerbot list
                 playerbots.Add(gameObject);
             };
@@ -381,6 +390,20 @@ namespace PlayerBots
 
             // Cleanup spawn card
             Destroy(card);
+        }
+
+        private static void MaybeAttachOperatorDroneSupport(GameObject masterObject, GameObject bodyPrefab)
+        {
+            if (!masterObject || !bodyPrefab || EnableDroneSupport == null || !EnableDroneSupport.Value)
+            {
+                return;
+            }
+
+            CharacterBody operatorBody = DLC3Content.BodyPrefabs.DroneTechBody;
+            if ((operatorBody && bodyPrefab == operatorBody.gameObject && !masterObject.GetComponent<OperatorDroneSupport>()) || EnableDroneSupportAllBots.Value == true)
+            {
+                masterObject.AddComponent<OperatorDroneSupport>();
+            }
         }
 
         private static Transform GetRandomSpawnPosition(CharacterMaster owner)

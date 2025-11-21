@@ -12,6 +12,8 @@ namespace PlayerBots.Custom
 {
     class PlayerBotController : MonoBehaviour
     {
+        private const float TeleportActivationDelay = 5f;
+
         public CharacterMaster master;
         public CharacterBody body;
         public EntityStateMachine stateMachine;
@@ -112,6 +114,10 @@ namespace PlayerBots.Custom
         {
             // Skip if teleportation is disabled
             if (PlayerBotManager.BotTeleportDistance.Value <= 0f)
+                return;
+
+            // Skip until run has been active long enough
+            if (!Run.instance || Run.instance.GetRunStopwatch() < TeleportActivationDelay)
                 return;
 
             // Skip if no body or bot is dead

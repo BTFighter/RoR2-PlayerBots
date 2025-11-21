@@ -1,3 +1,8 @@
+- **0.9.7 (ror2 1.4.0)**
+	- Operator can now buy drones.
+        - Can be adjusted in the config. Set to 0 to disable this feature.
+		- Can also adjust in the config to allow all characters to buy drones.
+	- Fixed early-pod teleport spam.
 - **0.9.6 (ror2 1.4.0)**
 	- Thunderstore page rework.
 - **0.9.5 (ror2 1.4.0)**

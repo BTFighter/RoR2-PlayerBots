@@ -38,6 +38,7 @@ A fork of a mod for Risk of Rain 2 with added features and more custom character
 | [Alien Hominid](https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/TheTimesweeper-Alien_Hominid-1.2.4.png.128x128_q95.png)  
 | [Arsonist](https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/PopcornFactory-Arsonist_Mod-3.0.5.png.128x128_q95.jpg)  
 | [Assassin](https://thunderstore.io/package/HasteReapr/AssassinMod/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/HasteReapr-AssassinMod-2.2.2.png.128x128_q95.png)  
+| [Bandit Reloaded](https://thunderstore.io/package/TeamSillyGuy/Bastian/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/Dragonyck-BanditReloaded-4.1.4.png.128x128_q95.jpg)  
 | [Bastian](https://thunderstore.io/package/TeamSillyGuy/Bastian/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/TeamSillyGuy-Bastian-3.0.0.png.128x128_q95.jpg)  
 | [Bomber](https://thunderstore.io/package/Dragonyck/Bomber/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/Dragonyck-Bomber-1.4.1.png.128x128_q95.jpg)  
 | [Cadet](https://thunderstore.io/package/tsuyoikenko/Cadet/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/tsuyoikenko-Cadet-1.1.8.png.128x128_q95.png)  
@@ -47,8 +48,9 @@ A fork of a mod for Risk of Rain 2 with added features and more custom character
 | [Dancer](https://thunderstore.io/package/nayDPz/Dancer/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/nayDPz-Dancer-0.10.0.png.128x128_q95.png)  
 | [Deputy](https://thunderstore.io/package/Bog/Deputy/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/Bog-Deputy-0.3.4.png.128x128_q95.png)  
 | [Desolator](https://thunderstore.io/package/TheTimesweeper/Red_Alert/) | ![alt text](https://raw.githubusercontent.com/BTFighter/RoR2-PlayerBots/refs/heads/master/images/Desolator.png)  
-| [Driver](https://thunderstore.io/package/public_ParticleSystem/Driver/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/public_ParticleSystem-Driver-2.1.8.png.128x128_q95.jpg)  
-| [Executioner](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/) | ![alt text](https://starstorm2.wiki.gg/images/thumb/Executioner.png/128px-Executioner.png?d5ddf3)  
+| [Driver](https://thunderstore.io/package/public_ParticleSystem/Driver/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/public_ParticleSystem-Driver-2.1.8.png.128x128_q95.jpg)
+| [Executioner](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/) | ![alt text](https://starstorm2.wiki.gg/images/thumb/Executioner.png/128px-Executioner.png?d5ddf3)    
+| [Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/EnforcerGang-Enforcer-3.11.8.png.128x128_q95.jpg)  
 | [Jhin](https://thunderstore.io/package/SeroRonin/Jhin/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/SeroRonin-Jhin-1.4.3.png.128x128_q95.png)  
 | [Jinx](https://thunderstore.io/package/lemonlust/JinxMod/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/lemonlust-JinxMod-1.4.2.png.128x128_q95.jpg)   
 | [Lee Hyperreal](https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/PopcornFactory-Lee_Hyperreal-2.1.4.png.128x128_q95.jpg)  
@@ -71,7 +73,6 @@ A fork of a mod for Risk of Rain 2 with added features and more custom character
 | [Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/DragonycksModdingComms-Zeri-1.0.4.png.128x128_q95.jpg)   
 
 </details>
-
 ## How to Spawn Bots
 You can spawn bots by opening your console (ctrl + alt + tilda) and running the command `addbot [survivor name OR survivor index] [amount]` or `addrandombot [amount]`. All arguements are optional and have a default value if they are not given. Example: `addbot engineer 5` will spawn 5 engineers that follow you.
 
