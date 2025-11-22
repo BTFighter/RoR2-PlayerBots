@@ -7,6 +7,17 @@ namespace PlayerBots.AI.SkillHelpers
     [SkillHelperSurvivor("DrifterBody")]
     class DrifterHelper : AiSkillHelper
     {
+        private DrifterBagController bagController;
+        private AISkillDriver primarySkillDriver;
+        private AISkillDriver utilitySkillDriver;
+        private AISkillDriver[] allSkillDrivers;
+        
+        // Track swings for throw logic
+        private int swingCount = 0;
+        private bool wasBagFull = false;
+        private float throwChance = 0.35f; // 35% chance to throw after 2 swings
+        private int swingsBeforeThrow = 2;
+
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {
             AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
@@ -25,6 +36,26 @@ namespace PlayerBots.AI.SkillHelpers
             skill4.resetCurrentEnemyOnNextDriverSelection = false;
             skill4.noRepeat = true;
             skill4.shouldSprint = false;
+
+            // Utility driver for throwing bagged entities
+            utilitySkillDriver = gameObject.AddComponent<AISkillDriver>();
+            utilitySkillDriver.customName = "UtilityThrow";
+            utilitySkillDriver.skillSlot = RoR2.SkillSlot.Utility;
+            utilitySkillDriver.requireSkillReady = true;
+            utilitySkillDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            utilitySkillDriver.minDistance = 0f;
+            utilitySkillDriver.maxDistance = 999f; // Will be controlled dynamically
+            utilitySkillDriver.selectionRequiresTargetLoS = false;
+            utilitySkillDriver.activationRequiresTargetLoS = false;
+            utilitySkillDriver.activationRequiresAimConfirmation = true;
+            utilitySkillDriver.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            utilitySkillDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
+            utilitySkillDriver.ignoreNodeGraph = false;
+            utilitySkillDriver.resetCurrentEnemyOnNextDriverSelection = false;
+            utilitySkillDriver.noRepeat = false;
+            utilitySkillDriver.shouldSprint = false;
+            utilitySkillDriver.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            utilitySkillDriver.driverUpdateTimerOverride = 0.5f;
 
             AISkillDriver utilityDriver = gameObject.AddComponent<AISkillDriver>();
             utilityDriver.customName = "Utility";
@@ -97,26 +128,169 @@ namespace PlayerBots.AI.SkillHelpers
             chaseSkill.noRepeat = false;
             chaseSkill.shouldSprint = true;
 
-            // Skills
-            AISkillDriver skill1 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            skill1.customName = "Primary";
-            skill1.skillSlot = RoR2.SkillSlot.Primary;
-            skill1.requireSkillReady = true;
-            skill1.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            skill1.minDistance = 0;
-            skill1.maxDistance = 10;
-            skill1.selectionRequiresTargetLoS = true;
-            skill1.activationRequiresTargetLoS = true;
-            skill1.activationRequiresAimConfirmation = false;
-            skill1.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            skill1.aimType = AISkillDriver.AimType.AtMoveTarget;
-            skill1.ignoreNodeGraph = true;
-            skill1.resetCurrentEnemyOnNextDriverSelection = false;
-            skill1.noRepeat = false;
-            skill1.shouldSprint = false;
+            // Primary skill - will be used when bag is full
+            primarySkillDriver = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            primarySkillDriver.customName = "Primary";
+            primarySkillDriver.skillSlot = RoR2.SkillSlot.Primary;
+            primarySkillDriver.requireSkillReady = false; // Don't require ready so it can spam
+            primarySkillDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            primarySkillDriver.minDistance = 0;
+            primarySkillDriver.maxDistance = 10;
+            primarySkillDriver.selectionRequiresTargetLoS = false; // Don't require LOS when bagged
+            primarySkillDriver.activationRequiresTargetLoS = false; // Don't require LOS when bagged
+            primarySkillDriver.activationRequiresAimConfirmation = false;
+            primarySkillDriver.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            primarySkillDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
+            primarySkillDriver.ignoreNodeGraph = true;
+            primarySkillDriver.resetCurrentEnemyOnNextDriverSelection = false;
+            primarySkillDriver.noRepeat = false;
+            primarySkillDriver.shouldSprint = false;
+            primarySkillDriver.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
 
             // Add default skills
             AddDefaultSkills(gameObject, ai, 0);
+
+            // Cache all skill drivers for reordering
+            allSkillDrivers = gameObject.GetComponents<AISkillDriver>();
+        }
+
+        public override void OnBodyChange()
+        {
+            base.OnBodyChange();
+            this.bagController = null;
+            this.swingCount = 0;
+            this.wasBagFull = false;
+            
+            // Re-cache skill drivers when body changes
+            if (controller?.body != null)
+            {
+                allSkillDrivers = controller.body.gameObject.GetComponents<AISkillDriver>();
+                foreach (var driver in allSkillDrivers)
+                {
+                    if (driver.customName == "Primary")
+                    {
+                        primarySkillDriver = driver;
+                    }
+                    else if (driver.customName == "UtilityThrow")
+                    {
+                        utilitySkillDriver = driver;
+                    }
+                }
+            }
+        }
+
+        public override void OnFixedUpdate()
+        {
+            base.OnFixedUpdate();
+
+            // Get bag controller if not cached
+            if (this.bagController == null && controller?.body != null)
+            {
+                this.bagController = controller.body.GetComponent<DrifterBagController>();
+            }
+
+            if (this.bagController == null || primarySkillDriver == null || utilitySkillDriver == null)
+            {
+                return;
+            }
+
+            bool isBagFull = this.bagController.bagFull;
+
+            // Track when bag status changes
+            if (isBagFull && !wasBagFull)
+            {
+                // Just grabbed something, reset swing count
+                swingCount = 0;
+            }
+            else if (!isBagFull && wasBagFull)
+            {
+                // Bag was emptied, reset swing count
+                swingCount = 0;
+            }
+
+            wasBagFull = isBagFull;
+
+            // Check if primary skill was just used (approximate by checking skill stock/cooldown)
+            if (isBagFull && controller?.body?.skillLocator?.primary != null)
+            {
+                var primarySkill = controller.body.skillLocator.primary;
+                
+                // If skill is on cooldown, it was just used
+                if (primarySkill.stock < primarySkill.maxStock)
+                {
+                    // Increment swing count (this will increment multiple times during cooldown,
+                    // but we'll use a simple approach and check every few frames)
+                    if (Time.frameCount % 30 == 0) // Check roughly every 0.5 seconds at 60fps
+                    {
+                        swingCount++;
+                    }
+                }
+            }
+
+            // Adjust skill driver priorities based on bag status and swing count
+            if (isBagFull)
+            {
+                // Check if we should throw after enough swings
+                bool shouldAttemptThrow = swingCount >= swingsBeforeThrow && Random.value < throwChance;
+
+                if (shouldAttemptThrow && controller?.body?.skillLocator?.utility != null)
+                {
+                    var utilitySkill = controller.body.skillLocator.utility;
+                    
+                    // Only enable throw if utility is ready
+                    if (utilitySkill.IsReady())
+                    {
+                        // Enable utility throw driver
+                        utilitySkillDriver.minDistance = 0;
+                        utilitySkillDriver.maxDistance = 999f;
+                        
+                        // Disable primary temporarily to allow throw
+                        primarySkillDriver.minDistance = 0;
+                        primarySkillDriver.maxDistance = 0; // Disable
+                        
+                        // Reset swing count after attempting throw
+                        swingCount = 0;
+                    }
+                    else
+                    {
+                        // Utility not ready, continue smacking
+                        EnablePrimaryDriver();
+                        DisableUtilityThrowDriver();
+                    }
+                }
+                else
+                {
+                    // Continue smacking
+                    EnablePrimaryDriver();
+                    DisableUtilityThrowDriver();
+                }
+            }
+            else
+            {
+                // Reset to normal behavior when bag is empty
+                primarySkillDriver.minDistance = 0;
+                primarySkillDriver.maxDistance = 10;
+                primarySkillDriver.requireSkillReady = false;
+                primarySkillDriver.selectionRequiresTargetLoS = true;
+                primarySkillDriver.activationRequiresTargetLoS = true;
+                
+                DisableUtilityThrowDriver();
+            }
+        }
+
+        private void EnablePrimaryDriver()
+        {
+            primarySkillDriver.minDistance = 0;
+            primarySkillDriver.maxDistance = 999f; // Always in range
+            primarySkillDriver.requireSkillReady = false;
+            primarySkillDriver.selectionRequiresTargetLoS = false;
+            primarySkillDriver.activationRequiresTargetLoS = false;
+        }
+
+        private void DisableUtilityThrowDriver()
+        {
+            utilitySkillDriver.minDistance = 0;
+            utilitySkillDriver.maxDistance = 0; // Disable
         }
     }
 }
