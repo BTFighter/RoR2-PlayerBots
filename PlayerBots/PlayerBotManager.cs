@@ -48,6 +48,7 @@ namespace PlayerBots
         public static ConfigEntry<bool> DontScaleInteractables { get; set; }
         public static ConfigEntry<bool> BotsUseInteractables { get; set; }
         public static ConfigEntry<bool> ContinueAfterDeath { get; set; }
+        public static ConfigEntry<string> ContinueAfterDeathBlacklist { get; set; }
         public static ConfigEntry<bool> RespawnAfterWave { get; set; }
         public static ConfigEntry<float> BotTeleportDistance { get; set; }
         public static ConfigEntry<bool> EnableDroneSupport { get; set; }
@@ -84,6 +85,7 @@ namespace PlayerBots
             DontScaleInteractables = Config.Bind("Player Mode", "DontScaleInteractables", true, "Prevents interactables spawn count from scaling with bots. Only active is PlayerMode is true.");
             BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
+            ContinueAfterDeathBlacklist = Config.Bind("Player Mode", "ContinueAfterDeathBlacklist", "arena,artifactworld,artifactworld01,artifactworld02,artifactworld03,bazaar,computationalexchange,conduitcanyon,goldshores,meridian,moon,moon2,mysteryspace,solusweb,solutionalhaunt,voidraid,voidstage", "List of stage names where ContinueAfterDeath should be disabled. Only active if PlayerMode and ContinueAfterDeath are true.");
 
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
 
@@ -522,6 +524,48 @@ namespace PlayerBots
         public void FixedUpdate()
         {
             allRealPlayersDead = !PlayerCharacterMasterController.instances.Any(p => p.preventGameOver && p.isConnected);
+        }
+
+        /// <summary>
+        /// Checks if ContinueAfterDeath should be active for the current stage.
+        /// Returns false if the current stage is in the blacklist.
+        /// </summary>
+        public static bool IsContinueAfterDeathAllowedForCurrentStage()
+        {
+            if (!ContinueAfterDeath.Value)
+            {
+                return false;
+            }
+
+            string blacklist = ContinueAfterDeathBlacklist?.Value;
+            if (string.IsNullOrWhiteSpace(blacklist))
+            {
+                return true;
+            }
+
+            SceneDef currentScene = SceneCatalog.mostRecentSceneDef;
+            if (currentScene == null)
+            {
+                return true;
+            }
+
+            string currentSceneName = currentScene.baseSceneName;
+            if (string.IsNullOrEmpty(currentSceneName))
+            {
+                return true;
+            }
+
+            string[] blacklistedStages = blacklist.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string stage in blacklistedStages)
+            {
+                string trimmedStage = stage.Trim();
+                if (string.Equals(trimmedStage, currentSceneName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         [ConCommand(commandName = "addbot", flags = ConVarFlags.ExecuteOnServer, helpText = "Adds a playerbot. Usage: addbot [character index] [amount] [network user index]")]

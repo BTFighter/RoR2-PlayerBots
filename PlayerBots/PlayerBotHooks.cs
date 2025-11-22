@@ -298,7 +298,15 @@ namespace PlayerBots
                         ILCursor c = new ILCursor(il);
                         c.GotoNext(x => x.MatchCallvirt<PlayerCharacterMasterController>("get_isConnected"));
                         c.Index += 1;
-                        c.EmitDelegate<Func<bool, bool>>(x => true);
+                        c.EmitDelegate<Func<bool, bool>>(x => 
+                        {
+                            // Check if ContinueAfterDeath is allowed for the current stage
+                            if (PlayerBotManager.IsContinueAfterDeathAllowedForCurrentStage())
+                            {
+                                return true;
+                            }
+                            return x;
+                        });
                     };
                 }
 
