@@ -55,6 +55,12 @@ namespace PlayerBots
 
         public static ConfigEntry<bool> EnableDroneSupportAllBots { get; set; }
 
+        // Survivor blacklist for random bot spawning
+        public static ConfigEntry<string> SurvivorBlacklist { get; set; }
+
+        // Item blacklist for bot purchases
+        public static ConfigEntry<string> ItemBlacklist { get; set; }
+
         //
         public static bool allRealPlayersDead;
 
@@ -92,6 +98,12 @@ namespace PlayerBots
             BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
             EnableDroneSupport = Config.Bind("Player Mode", "EnableDroneSupport", true, "Allow Operator bots to purchase support drones.");
             EnableDroneSupportAllBots = Config.Bind("Player Mode", "EnableDroneSupportAllBots", false, "Allow all bots to purchase support drones. EnableDroneSupport must be enabled.");
+
+            // Survivor blacklist for random bot spawning
+            SurvivorBlacklist = Config.Bind("Starting Bots", "SurvivorBlacklist", "", "Comma-separated list of survivor names to exclude from random bot spawning. Supports both in-game display names (e.g., 'Chef', 'Mercenary') and technical asset names (e.g., 'GnomeChefBody', 'MercenaryBody'). Leave empty to disable filtering. Use pb_listsurvivors to see available survivor names.");
+
+            // Item blacklist for bot purchases
+            ItemBlacklist = Config.Bind("Bot Inventory", "ItemBlacklist", "", "Comma-separated list of item names that bots will never buy. Leave empty to disable filtering.");
 
             // Sanity check
             MaxBuyingDelay.Value = Math.Max(MaxBuyingDelay.Value, MinBuyingDelay.Value);
@@ -204,7 +216,8 @@ namespace PlayerBots
             card.occupyPosition = false;
             card.sendOverNetwork = true;
             card.forbiddenFlags = NodeFlags.NoCharacterSpawn;
-            card.prefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/CharacterMasters/CommandoMaster");
+            card.prefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/CharacterMasters/CommandoMonsterMaster");
+            card.bodyPrefab = bodyPrefab;
 
             // Get spawn position
             Transform spawnPosition = GetRandomSpawnPosition(owner);
@@ -242,12 +255,6 @@ namespace PlayerBots
                 aiOwnership.ownerMaster = owner;
 
                 CharacterMaster master = gameObject.GetComponent<CharacterMaster>();
-                PlayerCharacterMasterController playerMaster = gameObject.GetComponent<PlayerCharacterMasterController>();
-                playerMaster.name = "PlayerBot";
-
-                // Required to bypass entitlements
-                master.bodyPrefab = bodyPrefab;
-                master.Respawn(master.transform.position, master.transform.rotation);
 
                 // Random skin
                 SetRandomSkin(master, bodyPrefab);
@@ -275,12 +282,12 @@ namespace PlayerBots
             };
 
             // Don't freeze the game if there is an error spawning the bot
-            try 
+            try
             {
                 DirectorCore.instance.TrySpawnObject(spawnRequest);
             }
-            catch (Exception e) 
-            { 
+            catch (Exception e)
+            {
                 Debug.LogError(e);
             }
 
@@ -501,11 +508,23 @@ namespace PlayerBots
             for (int i = 0; i < amount; i++)
             {
                 int randomSurvivorIndex = -1;
+                int attempts = 0;
                 do
                 {
                     randomSurvivorIndex = random.Next(0, RandomSurvivorsList.Count);
+                    attempts++;
+                    
+                    // Prevent infinite loop if all survivors are blacklisted/whitelisted
+                    if (attempts > RandomSurvivorsList.Count * 2)
+                    {
+                        BotLogger.LogWarning("All survivors appear to be filtered out. Defaulting to first available survivor.");
+                        break;
+                    }
                 }
-                while ((randomSurvivorIndex == lastCharacterType || !SurvivorCatalog.GetSurvivorDef((SurvivorIndex) RandomSurvivorsList[randomSurvivorIndex]).CheckRequiredExpansionEnabled()) && RandomSurvivorsList.Count > 1);
+                while ((randomSurvivorIndex == lastCharacterType || 
+                        !SurvivorCatalog.GetSurvivorDef((SurvivorIndex) RandomSurvivorsList[randomSurvivorIndex]).CheckRequiredExpansionEnabled() ||
+                        !IsSurvivorAllowed(RandomSurvivorsList[randomSurvivorIndex])) 
+                       && RandomSurvivorsList.Count > 1);
 
                 SpawnPlayerbot(owner, RandomSurvivorsList[randomSurvivorIndex]);
 
@@ -566,6 +585,117 @@ namespace PlayerBots
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Checks if a survivor is allowed based on the blacklist configuration.
+        /// Returns true if the survivor should be included in random selection.
+        /// Supports both display names (e.g., "Chef") and body prefab names (e.g., "GnomeChefBody").
+        /// </summary>
+        public static bool IsSurvivorAllowed(SurvivorIndex survivorIndex)
+        {
+            string blacklist = SurvivorBlacklist?.Value;
+            if (string.IsNullOrWhiteSpace(blacklist))
+            {
+                return true; // No filtering enabled
+            }
+
+            string[] blacklistedSurvivors = blacklist.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            // Get both display name and body prefab name
+            string displayName = GetSurvivorDisplayName(survivorIndex).ToLowerInvariant();
+            string bodyPrefabName = GetSurvivorBodyPrefabName(survivorIndex).ToLowerInvariant();
+
+            foreach (string survivor in blacklistedSurvivors)
+            {
+                string trimmedSurvivor = survivor.Trim().ToLowerInvariant();
+                
+                // Check if the blacklist entry matches either the display name or body prefab name
+                if (trimmedSurvivor == displayName || trimmedSurvivor == bodyPrefabName)
+                {
+                    return false; // Survivor is blacklisted
+                }
+            }
+
+            return true; // Survivor is not in blacklist
+        }
+
+        /// <summary>
+        /// Gets the display name for a survivor index.
+        /// </summary>
+        private static string GetSurvivorDisplayName(SurvivorIndex survivorIndex)
+        {
+            SurvivorDef def = SurvivorCatalog.GetSurvivorDef(survivorIndex);
+            if (def == null)
+            {
+                return survivorIndex.ToString();
+            }
+
+            CharacterBody body = def.bodyPrefab.GetComponent<CharacterBody>();
+            return body ? body.GetDisplayName() : def.survivorIndex.ToString();
+        }
+
+        /// <summary>
+        /// Gets the body prefab name for a survivor index.
+        /// </summary>
+        private static string GetSurvivorBodyPrefabName(SurvivorIndex survivorIndex)
+        {
+            SurvivorDef def = SurvivorCatalog.GetSurvivorDef(survivorIndex);
+            if (def == null)
+            {
+                return survivorIndex.ToString();
+            }
+
+            return def.bodyPrefab ? def.bodyPrefab.name : def.survivorIndex.ToString();
+        }
+
+        /// <summary>
+        /// Gets the display name for a survivor index.
+        /// </summary>
+        private static string GetSurvivorName(SurvivorIndex survivorIndex)
+        {
+            return GetSurvivorDisplayName(survivorIndex);
+        }
+
+        /// <summary>
+        /// Checks if an item is blacklisted from bot purchases.
+        /// Returns true if the item is allowed to be purchased.
+        /// </summary>
+        public static bool IsItemAllowed(ItemIndex itemIndex)
+        {
+            string blacklist = ItemBlacklist?.Value;
+            if (string.IsNullOrWhiteSpace(blacklist))
+            {
+                return true; // No filtering enabled
+            }
+
+            string[] blacklistedItems = blacklist.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            string itemName = GetItemName(itemIndex).ToLowerInvariant();
+
+            foreach (string item in blacklistedItems)
+            {
+                string trimmedItem = item.Trim().ToLowerInvariant();
+                if (trimmedItem == itemName)
+                {
+                    return false; // Item is blacklisted
+                }
+            }
+
+            return true; // Item is not in blacklist
+        }
+
+        /// <summary>
+        /// Gets the name for an item index.
+        /// </summary>
+        private static string GetItemName(ItemIndex itemIndex)
+        {
+            ItemDef def = ItemCatalog.GetItemDef(itemIndex);
+            if (def == null)
+            {
+                return itemIndex.ToString();
+            }
+
+            return def.name;
         }
 
         [ConCommand(commandName = "addbot", flags = ConVarFlags.ExecuteOnServer, helpText = "Adds a playerbot. Usage: addbot [character index] [amount] [network user index]")]
@@ -657,7 +787,31 @@ namespace PlayerBots
                     for (int i = 0; i < amount; i++)
                     {
                         int randomIndex = rand.Next(0, RandomSurvivorsList.Count);
-                        SpawnPlayerbots(user.master, RandomSurvivorsList[randomIndex], 1);
+                        // Check if the selected survivor is allowed before spawning
+                        if (IsSurvivorAllowed(RandomSurvivorsList[randomIndex]))
+                        {
+                            SpawnPlayerbots(user.master, RandomSurvivorsList[randomIndex], 1);
+                        }
+                        else
+                        {
+                            // Try to find an allowed survivor
+                            bool foundAllowed = false;
+                            for (int attempts = 0; attempts < RandomSurvivorsList.Count; attempts++)
+                            {
+                                int retryIndex = rand.Next(0, RandomSurvivorsList.Count);
+                                if (IsSurvivorAllowed(RandomSurvivorsList[retryIndex]))
+                                {
+                                    SpawnPlayerbots(user.master, RandomSurvivorsList[retryIndex], 1);
+                                    foundAllowed = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!foundAllowed)
+                            {
+                                Debug.LogWarning("All available survivors appear to be filtered out. Skipping this bot spawn.");
+                            }
+                        }
                     }
                 }
             }

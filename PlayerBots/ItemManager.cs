@@ -129,10 +129,21 @@ namespace PlayerBots
             // Pickup
             if (dropList != null && dropList.Count > 0)
             {
-                List<PickupIndex> filteredDropList = dropList.Where((PickupIndex pickupIndex) => !IsScrapPickup(pickupIndex)).ToList();
+                List<PickupIndex> filteredDropList = dropList.Where((PickupIndex pickupIndex) => 
+                {
+                    if (IsScrapPickup(pickupIndex))
+                        return false;
+                        
+                    PickupDef pickupDef = PickupCatalog.GetPickupDef(pickupIndex);
+                    if (pickupDef == null || pickupDef.itemIndex == ItemIndex.None)
+                        return true; // Allow non-item pickups (equipment, etc.)
+                        
+                    return PlayerBotManager.IsItemAllowed(pickupDef.itemIndex);
+                }).ToList();
+                
                 if (filteredDropList.Count == 0)
                 {
-                    // No valid (non-scrap) pickups available, so abort the purchase
+                    // No valid (non-scrap, non-blacklisted) pickups available, so abort the purchase
                     return;
                 }
 
