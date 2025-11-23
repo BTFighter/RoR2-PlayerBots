@@ -18,10 +18,6 @@ namespace PlayerBots
         private Run.FixedTimeStamp lastBuyCheck;
         private float buyingDelay;
 
-        // Sale Star item indices
-        private ItemIndex saleStarItemIndex = ItemIndex.None;
-        private ItemIndex saleStarConsumedItemIndex = ItemIndex.None;
-
         public void Awake()
         {
             this.master = base.gameObject.GetComponent<CharacterMaster>();
@@ -32,27 +28,8 @@ namespace PlayerBots
             this.chestPicker.AddChoice(ChestTier.GREEN, PlayerBotManager.Tier2ChestBotWeight.Value);
             this.chestPicker.AddChoice(ChestTier.RED, PlayerBotManager.Tier3ChestBotWeight.Value);
 
-            // Initialize Sale Star item indices
-            InitializeSaleStarItems();
-
             ResetPurchases();
             ResetBuyingDelay();
-        }
-
-        private void InitializeSaleStarItems()
-        {
-            // Try to find Sale Star items by common name patterns
-            saleStarItemIndex = ItemCatalog.FindItemIndex("LowerPricedChests");
-            if (saleStarItemIndex == ItemIndex.None)
-            {
-                saleStarItemIndex = ItemCatalog.FindItemIndex("SaleStar");
-            }
-            
-            saleStarConsumedItemIndex = ItemCatalog.FindItemIndex("LowerPricedChestsConsumed");
-            if (saleStarConsumedItemIndex == ItemIndex.None)
-            {
-                saleStarConsumedItemIndex = ItemCatalog.FindItemIndex("SaleStarConsumed");
-            }
         }
 
         public void FixedUpdate()
@@ -129,13 +106,6 @@ namespace PlayerBots
 
         private void Buy(ChestTier chestTier)
         {
-            // Check for Sale Star and consume it if present
-            bool hasSaleStar = HasActiveSaleStar();
-            if (hasSaleStar)
-            {
-                TryConsumeSaleStar();
-            }
-
             // Get drop list
             List<PickupIndex> dropList = null;
             switch (chestTier)
@@ -177,58 +147,32 @@ namespace PlayerBots
                     return;
                 }
 
-                // Determine how many items to give (2 if Sale Star was active, otherwise 1)
-                int itemsToGive = hasSaleStar ? 2 : 1;
-                int itemsGiven = 0;
-                PickupIndex firstPickupIndex = PickupIndex.none;
-                ItemIndex firstItemIndex = ItemIndex.None;
-
-                while (itemsGiven < itemsToGive && filteredDropList.Count > 0)
+                PickupIndex dropPickup = Run.instance.treasureRng.NextElementUniform<PickupIndex>(filteredDropList);
+                PickupDef pickup = PickupCatalog.GetPickupDef(dropPickup);
+                if (pickup.itemIndex != ItemIndex.None)
                 {
-                    PickupIndex dropPickup = Run.instance.treasureRng.NextElementUniform<PickupIndex>(filteredDropList);
-                    PickupDef pickup = PickupCatalog.GetPickupDef(dropPickup);
-                    
-                    if (pickup.itemIndex != ItemIndex.None)
-                    {
-                        this.master.inventory.GiveItem(pickup.itemIndex, 1);
-                        
-                        // Store first pickup info for chat message
-                        if (itemsGiven == 0)
-                        {
-                            firstPickupIndex = dropPickup;
-                            firstItemIndex = pickup.itemIndex;
-                        }
-                    }
-                    else if (pickup.equipmentIndex != EquipmentIndex.None)
-                    {
-                        // For equipment, only give one regardless of Sale Star
-                        if (itemsGiven == 0)
-                        {
-                            this.master.inventory.SetEquipmentIndex(pickup.equipmentIndex);
-                            firstPickupIndex = dropPickup;
-                            firstItemIndex = ItemIndex.None;
-                        }
-                    }
-                    else
-                    {
-                        // Neither item nor valid equipment, skip
-                        continue;
-                    }
-
-                    itemsGiven++;
+                    this.master.inventory.GiveItem(pickup.itemIndex, 1);
                 }
-
-                // Chat message (only for the first item to avoid spam)
-                if (PlayerBotManager.ShowBuyMessages.Value && itemsGiven > 0 && firstPickupIndex != PickupIndex.none)
+                else if (pickup.equipmentIndex != EquipmentIndex.None)
                 {
-                    PickupDef firstPickupDef = PickupCatalog.GetPickupDef(firstPickupIndex);
+                    this.master.inventory.SetEquipmentIndex(pickup.equipmentIndex);
+                }
+                else
+                {
+                    // Neither item nor valid equipment
+                    return;
+                }
+                // Chat
+                if (PlayerBotManager.ShowBuyMessages.Value)
+                {
+                    PickupDef pickupDef = PickupCatalog.GetPickupDef(dropPickup);
                     Chat.SendBroadcastChat(new Chat.PlayerPickupChatMessage
                     {
                         subjectAsCharacterBody = this.master.GetBody(),
                         baseToken = "PLAYER_PICKUP",
-                        pickupToken = ((firstPickupDef != null) ? firstPickupDef.nameToken : null) ?? PickupCatalog.invalidPickupToken,
-                        pickupColor = (firstPickupDef != null) ? firstPickupDef.baseColor : Color.black,
-                        pickupQuantity = firstItemIndex != ItemIndex.None ? (uint)this.master.inventory.GetItemCount(firstItemIndex) : 1
+                        pickupToken = ((pickupDef != null) ? pickupDef.nameToken : null) ?? PickupCatalog.invalidPickupToken,
+                        pickupColor = (pickupDef != null) ? pickupDef.baseColor : Color.black,
+                        pickupQuantity = pickup.itemIndex != ItemIndex.None ? (uint)this.master.inventory.GetItemCount(pickup.itemIndex) : 1
                     });
                 }
             }
@@ -262,30 +206,6 @@ namespace PlayerBots
             }
 
             return itemDef.ContainsTag(ItemTag.Scrap) || itemDef.ContainsTag(ItemTag.PriorityScrap);
-        }
-
-        private bool HasActiveSaleStar()
-        {
-            return saleStarItemIndex != ItemIndex.None && this.master.inventory.GetItemCount(saleStarItemIndex) > 0;
-        }
-
-        private bool TryConsumeSaleStar()
-        {
-            if (saleStarItemIndex == ItemIndex.None || saleStarConsumedItemIndex == ItemIndex.None)
-            {
-                return false;
-            }
-
-            int currentCount = this.master.inventory.GetItemCount(saleStarItemIndex);
-            if (currentCount > 0)
-            {
-                // Transform active Sale Star to consumed version
-                this.master.inventory.RemoveItem(saleStarItemIndex, 1);
-                this.master.inventory.GiveItem(saleStarConsumedItemIndex, 1);
-                return true;
-            }
-
-            return false;
         }
     }
 }

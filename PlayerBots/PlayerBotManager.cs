@@ -52,8 +52,13 @@ namespace PlayerBots
         public static ConfigEntry<bool> RespawnAfterWave { get; set; }
         public static ConfigEntry<float> BotTeleportDistance { get; set; }
         public static ConfigEntry<bool> EnableDroneSupport { get; set; }
+
         public static ConfigEntry<bool> EnableDroneSupportAllBots { get; set; }
+
+        // Survivor blacklist for random bot spawning
         public static ConfigEntry<string> SurvivorBlacklist { get; set; }
+
+        // Item blacklist for bot purchases
         public static ConfigEntry<string> ItemBlacklist { get; set; }
 
         //
@@ -65,7 +70,6 @@ namespace PlayerBots
 
             // Config
             InitialRandomBots = Config.Bind("Starting Bots", "StartingBots.Random", 0, "Starting amount of bots to spawn at the start of a run. (Random)");
-            SurvivorBlacklist = Config.Bind("Starting Bots", "SurvivorBlacklist", "", "List of survivors to exclude from random bot spawning. Supports display names (e.g., 'Chef', 'Mercenary') and technical asset names (e.g., 'GnomeChefBody', 'MercenaryBody'). Use pb_listsurvivors to see available survivor names.");
 
             AutoPurchaseItems = Config.Bind("Bot Inventory", "AutoPurchaseItems", true, "Maximum amount of purchases a playerbot can do per stage. Items are purchased directly instead of from chests.");
             MaxBotPurchasesPerStage = Config.Bind("Bot Inventory", "MaxBotPurchasesPerStage", 10, "Maximum amount of putchases a playerbot can do per stage.");
@@ -79,21 +83,27 @@ namespace PlayerBots
             MinBuyingDelay = Config.Bind("Bot Inventory", "MinBuyingDelay", 0f, "Minimum delay in seconds between the time it takes for a bot checks to buy an item.");
             MaxBuyingDelay = Config.Bind("Bot Inventory", "MaxBuyingDelay", 5f, "Maximum delay in seconds between the time it takes for a bot checks to buy an item.");
             ShowBuyMessages = Config.Bind("Bot Inventory", "ShowBuyMessages", true, "Displays whenever a bot buys an item in chat.");
-            ItemBlacklist = Config.Bind("Bot Inventory", "ItemBlacklist", "", "List of item names that bots will never buy.");
 
             HostOnlySpawnBots = Config.Bind("Misc", "HostOnlySpawnBots", true, "Set true so that only the host may spawn bots");
             ShowNameplates = Config.Bind("Misc", "ShowNameplates", true, "Show player nameplates on playerbots if PlayerMode is false. (Host only)");
-            BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
 
             PlayerMode = Config.Bind("Player Mode", "PlayerMode", false, "Makes the game treat playerbots like how regular players are treated. The bots now show up on the scoreboard, can pick up items, influence the map scaling, etc.");
             DontScaleInteractables = Config.Bind("Player Mode", "DontScaleInteractables", true, "Prevents interactables spawn count from scaling with bots. Only active is PlayerMode is true.");
             BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
             ContinueAfterDeathBlacklist = Config.Bind("Player Mode", "ContinueAfterDeathBlacklist", "arena,artifactworld,artifactworld01,artifactworld02,artifactworld03,bazaar,computationalexchange,conduitcanyon,goldshores,meridian,moon,moon2,mysteryspace,solusweb,solutionalhaunt,voidraid,voidstage", "List of stage names where ContinueAfterDeath should be disabled. Only active if PlayerMode and ContinueAfterDeath are true.");
+
+            RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
+
+            BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
             EnableDroneSupport = Config.Bind("Player Mode", "EnableDroneSupport", true, "Allow Operator bots to purchase support drones.");
             EnableDroneSupportAllBots = Config.Bind("Player Mode", "EnableDroneSupportAllBots", false, "Allow all bots to purchase support drones. EnableDroneSupport must be enabled.");
 
-            RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
+            // Survivor blacklist for random bot spawning
+            SurvivorBlacklist = Config.Bind("Starting Bots", "SurvivorBlacklist", "", "Comma-separated list of survivor names to exclude from random bot spawning. Supports both in-game display names (e.g., 'Chef', 'Mercenary') and technical asset names (e.g., 'GnomeChefBody', 'MercenaryBody'). Leave empty to disable filtering. Use pb_listsurvivors to see available survivor names.");
+
+            // Item blacklist for bot purchases
+            ItemBlacklist = Config.Bind("Bot Inventory", "ItemBlacklist", "", "Comma-separated list of item names that bots will never buy. Leave empty to disable filtering.");
 
             // Sanity check
             MaxBuyingDelay.Value = Math.Max(MaxBuyingDelay.Value, MinBuyingDelay.Value);
