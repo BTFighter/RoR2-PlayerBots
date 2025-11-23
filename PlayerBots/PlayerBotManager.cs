@@ -55,6 +55,9 @@ namespace PlayerBots
 
         public static ConfigEntry<bool> EnableDroneSupportAllBots { get; set; }
 
+        // TeammateRevival compatibility
+        public static ConfigEntry<bool> EnableTeammateRevivalCompatibility { get; set; }
+
         // Survivor blacklist for random bot spawning
         public static ConfigEntry<string> SurvivorBlacklist { get; set; }
 
@@ -63,6 +66,21 @@ namespace PlayerBots
 
         //
         public static bool allRealPlayersDead;
+
+        /// <summary>
+        /// Checks if a CharacterMaster is controlled by a bot.
+        /// This is used for compatibility with TeammateRevival and other mods.
+        /// </summary>
+        /// <param name="master">The CharacterMaster to check</param>
+        /// <returns>True if the master is controlled by a bot, false otherwise</returns>
+        public static bool IsBot(CharacterMaster master)
+        {
+            if (!EnableTeammateRevivalCompatibility.Value)
+                return false;
+
+            var body = master?.GetBodyObject();
+            return body && body.GetComponent<PlayerBotController>() != null;
+        }
 
         public void Awake()
         {
@@ -98,6 +116,7 @@ namespace PlayerBots
             BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
             EnableDroneSupport = Config.Bind("Player Mode", "EnableDroneSupport", true, "Allow Operator bots to purchase support drones.");
             EnableDroneSupportAllBots = Config.Bind("Player Mode", "EnableDroneSupportAllBots", false, "Allow all bots to purchase support drones. EnableDroneSupport must be enabled.");
+            EnableTeammateRevivalCompatibility = Config.Bind("Misc", "EnableTeammateRevivalCompatibility", true, "Enable compatibility fixes for TeammateRevival mod. Should prevent SkillDriver null reference errors.");
 
             // Survivor blacklist for random bot spawning
             SurvivorBlacklist = Config.Bind("Starting Bots", "SurvivorBlacklist", "", "Comma-separated list of survivor names to exclude from random bot spawning. Supports both in-game display names (e.g., 'Chef', 'Mercenary') and technical asset names (e.g., 'GnomeChefBody', 'MercenaryBody'). Leave empty to disable filtering. Use pb_listsurvivors to see available survivor names.");
@@ -254,6 +273,14 @@ namespace PlayerBots
                 AIOwnership aiOwnership = gameObject.AddComponent<AIOwnership>() as AIOwnership;
                 aiOwnership.ownerMaster = owner;
 
+                // Add PlayerCharacterMasterController for TeammateRevival compatibility
+                if (EnableTeammateRevivalCompatibility.Value)
+                {
+                    var playerCharacterMasterController = gameObject.AddComponent<PlayerCharacterMasterController>();
+                    
+                    BotLogger.LogInfo("Added PlayerCharacterMasterController for TeammateRevival compatibility");
+                }
+
                 CharacterMaster master = gameObject.GetComponent<CharacterMaster>();
 
                 // Random skin
@@ -358,6 +385,14 @@ namespace PlayerBots
                 BaseAI ai = gameObject.GetComponent<BaseAI>();
                 AIOwnership aiOwnership = gameObject.AddComponent<AIOwnership>() as AIOwnership;
                 aiOwnership.ownerMaster = owner;
+
+                // Add PlayerCharacterMasterController for TeammateRevival compatibility
+                if (EnableTeammateRevivalCompatibility.Value)
+                {
+                    var playerCharacterMasterController = gameObject.AddComponent<PlayerCharacterMasterController>();
+                    
+                    BotLogger.LogInfo("Added PlayerCharacterMasterController for TeammateRevival compatibility (summon mode)");
+                }
 
                 if (master)
                 {
@@ -468,15 +503,67 @@ namespace PlayerBots
                 // Add skill drivers based on class
                 skillHelper.InjectSkills(gameObject, ai);
 
-                // Set new skill drivers
-                PropertyInfo property = typeof(BaseAI).GetProperty("skillDrivers");
-                property.DeclaringType.GetProperty("skillDrivers");
-                property.SetValue(ai, gameObject.GetComponents<AISkillDriver>(), BindingFlags.NonPublic | BindingFlags.Instance, null, null, null);
+                // Get the newly injected skill drivers and properly replace them using BaseAI method
+                AISkillDriver[] newSkillDrivers = gameObject.GetComponents<AISkillDriver>();
+                if (newSkillDrivers != null && newSkillDrivers.Length > 0)
+                {
+                    // Filter out null skill drivers before setting them
+                    var validSkillDrivers = new List<AISkillDriver>();
+                    int nullCount = 0;
+                    
+                    for (int i = 0; i < newSkillDrivers.Length; i++)
+                    {
+                        if (newSkillDrivers[i] != null)
+                        {
+                            validSkillDrivers.Add(newSkillDrivers[i]);
+                        }
+                        else
+                        {
+                            nullCount++;
+                        }
+                    }
+                    
+                    if (validSkillDrivers.Count > 0)
+                    {
+                        // Use the proper BaseAI method to replace skill drivers
+                        ai.ReplaceSkillDrivers(validSkillDrivers.ToArray());
+                    }
+                }
+                else
+                {
+                    BotLogger.LogWarning("No skill drivers found after injection!");
+                }
             }
             else
             {
-                // Add  skills
+                // Add default skills
                 skillHelper.AddDefaultSkills(gameObject, ai, 0);
+                
+                // Get the skill drivers and replace them
+                AISkillDriver[] defaultSkillDrivers = gameObject.GetComponents<AISkillDriver>();
+                if (defaultSkillDrivers != null && defaultSkillDrivers.Length > 0)
+                {
+                    // Filter out null skill drivers before setting them
+                    var validSkillDrivers = new List<AISkillDriver>();
+                    int nullCount = 0;
+                    
+                    for (int i = 0; i < defaultSkillDrivers.Length; i++)
+                    {
+                        if (defaultSkillDrivers[i] != null)
+                        {
+                            validSkillDrivers.Add(defaultSkillDrivers[i]);
+                        }
+                        else
+                        {
+                            nullCount++;
+                        }
+                    }
+                    
+                    if (validSkillDrivers.Count > 0)
+                    {
+                        ai.ReplaceSkillDrivers(validSkillDrivers.ToArray());
+                    }
+                }
             }
 
             // Set BaseAI properties
@@ -492,6 +579,13 @@ namespace PlayerBots
             // Add playerbot controller for extra behaviors and fixes
             PlayerBotController controller = gameObject.AddComponent<PlayerBotController>();
             controller.SetSkillHelper(skillHelper);
+
+            // Force skill driver re-initialization after a short delay if TeammateRevival compatibility is enabled
+            if (EnableTeammateRevivalCompatibility.Value)
+            {
+                gameObject.AddComponent<BotSkillDriverInitializer>();
+                gameObject.AddComponent<SafeSkillDriverEvaluator>();
+            }
         }
 
         public static void SpawnPlayerbots(CharacterMaster owner, SurvivorIndex characterType, int amount)
@@ -1099,5 +1193,7 @@ namespace PlayerBots
             NetworkUser user = args.sender;
             user.master.TrueKill();
         }
+
+
     }
 }
