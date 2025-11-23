@@ -216,8 +216,7 @@ namespace PlayerBots
             card.occupyPosition = false;
             card.sendOverNetwork = true;
             card.forbiddenFlags = NodeFlags.NoCharacterSpawn;
-            card.prefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/CharacterMasters/CommandoMonsterMaster");
-            card.bodyPrefab = bodyPrefab;
+            card.prefab = LegacyResourcesAPI.Load<GameObject>("Prefabs/CharacterMasters/CommandoMaster");
 
             // Get spawn position
             Transform spawnPosition = GetRandomSpawnPosition(owner);
@@ -255,6 +254,12 @@ namespace PlayerBots
                 aiOwnership.ownerMaster = owner;
 
                 CharacterMaster master = gameObject.GetComponent<CharacterMaster>();
+                PlayerCharacterMasterController playerMaster = gameObject.GetComponent<PlayerCharacterMasterController>();
+                playerMaster.name = "PlayerBot";
+
+                // Required to bypass entitlements
+                master.bodyPrefab = bodyPrefab;
+                master.Respawn(master.transform.position, master.transform.rotation);
 
                 // Random skin
                 SetRandomSkin(master, bodyPrefab);
@@ -282,12 +287,12 @@ namespace PlayerBots
             };
 
             // Don't freeze the game if there is an error spawning the bot
-            try
+            try 
             {
                 DirectorCore.instance.TrySpawnObject(spawnRequest);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) 
+            { 
                 Debug.LogError(e);
             }
 
@@ -440,6 +445,29 @@ namespace PlayerBots
             master.inventory.CopyItemsFrom(owner.inventory);
             master.inventory.RemoveItem(ItemCatalog.FindItemIndex("CaptainDefenseMatrix"), owner.inventory.GetItemCount(ItemCatalog.FindItemIndex("CaptainDefenseMatrix")));
             master.inventory.GiveItem(ItemCatalog.FindItemIndex("DrizzlePlayerHelper"), 1);
+            
+            // DEBUG: Give every bot a Sale Star for testing (REMOVE AFTER TESTING)
+            GiveDebugSaleStar(master);
+        }
+
+        private static void GiveDebugSaleStar(CharacterMaster master)
+        {
+            // Try to find and give Sale Star item
+            ItemIndex saleStarIndex = ItemCatalog.FindItemIndex("LowerPricedChests");
+            if (saleStarIndex == ItemIndex.None)
+            {
+                saleStarIndex = ItemCatalog.FindItemIndex("SaleStar");
+            }
+            
+            if (saleStarIndex != ItemIndex.None)
+            {
+                master.inventory.GiveItem(saleStarIndex, 1);
+                BotLogger.LogInfo($"Gave debug Sale Star to bot {master.name}");
+            }
+            else
+            {
+                BotLogger.LogWarning("Could not find Sale Star item to give to bot");
+            }
         }
 
         private static void SetRandomSkin(CharacterMaster master, GameObject bodyPrefab)
@@ -514,7 +542,7 @@ namespace PlayerBots
                     randomSurvivorIndex = random.Next(0, RandomSurvivorsList.Count);
                     attempts++;
                     
-                    // Prevent infinite loop if all survivors are blacklisted/whitelisted
+                    // Prevent infinite loop if all survivors are blacklisted
                     if (attempts > RandomSurvivorsList.Count * 2)
                     {
                         BotLogger.LogWarning("All survivors appear to be filtered out. Defaulting to first available survivor.");
@@ -647,14 +675,6 @@ namespace PlayerBots
             }
 
             return def.bodyPrefab ? def.bodyPrefab.name : def.survivorIndex.ToString();
-        }
-
-        /// <summary>
-        /// Gets the display name for a survivor index.
-        /// </summary>
-        private static string GetSurvivorName(SurvivorIndex survivorIndex)
-        {
-            return GetSurvivorDisplayName(survivorIndex);
         }
 
         /// <summary>

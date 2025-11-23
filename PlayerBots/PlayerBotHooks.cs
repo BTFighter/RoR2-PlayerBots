@@ -236,26 +236,6 @@ namespace PlayerBots
                         }
                         self.interactableCredit = credit;
                     }
-                    else
-                    {
-                        int count = PlayerCharacterMasterController.instances.Count((PlayerCharacterMasterController v) => v.networkUser);
-                        count += PlayerBotManager.playerbots.Count;
-                        float num = 0.5f + (float)count * 0.5f;
-                        ClassicStageInfo component = SceneInfo.instance.GetComponent<ClassicStageInfo>();
-                        int credit = (int)((float)component.sceneDirectorInteractibleCredits * num);
-                        if (component.bonusInteractibleCreditObjects != null)
-                        {
-                            for (int i = 0; i < component.bonusInteractibleCreditObjects.Length; i++)
-                            {
-                                ClassicStageInfo.BonusInteractibleCreditObject bonusInteractibleCreditObject = component.bonusInteractibleCreditObjects[i];
-                                if (bonusInteractibleCreditObject.objectThatGrantsPointsIfEnabled.activeSelf)
-                                {
-                                    credit += bonusInteractibleCreditObject.points;
-                                }
-                            }
-                        }
-                        self.interactableCredit = credit;
-                    }
 
                     orig(self);
                 };
