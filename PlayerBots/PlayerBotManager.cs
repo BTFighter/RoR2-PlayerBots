@@ -55,6 +55,9 @@ namespace PlayerBots
 
         public static ConfigEntry<bool> EnableDroneSupportAllBots { get; set; }
 
+        // TeammateRevival compatibility
+        public static ConfigEntry<bool> EnableTeammateRevivalCompatibility { get; set; }
+
         // Survivor blacklist for random bot spawning
         public static ConfigEntry<string> SurvivorBlacklist { get; set; }
 
@@ -64,12 +67,28 @@ namespace PlayerBots
         //
         public static bool allRealPlayersDead;
 
+        /// <summary>
+        /// Checks if a CharacterMaster is controlled by a bot.
+        /// This is used for compatibility with TeammateRevival and other mods.
+        /// </summary>
+        /// <param name="master">The CharacterMaster to check</param>
+        /// <returns>True if the master is controlled by a bot, false otherwise</returns>
+        public static bool IsBot(CharacterMaster master)
+        {
+            if (!EnableTeammateRevivalCompatibility.Value)
+                return false;
+
+            var body = master?.GetBodyObject();
+            return body && body.GetComponent<PlayerBotController>() != null;
+        }
+
         public void Awake()
         {
             BotLogger = Logger;
 
             // Config
             InitialRandomBots = Config.Bind("Starting Bots", "StartingBots.Random", 0, "Starting amount of bots to spawn at the start of a run. (Random)");
+            SurvivorBlacklist = Config.Bind("Starting Bots", "SurvivorBlacklist", "", "List of survivor names to exclude from random bot spawning. Supports display names (e.g., 'Chef', 'Mercenary') and asset names (e.g., 'GnomeChefBody', 'MercenaryBody'). Leave empty to disable filtering. Use pb_listsurvivors to see available survivor names.");
 
             AutoPurchaseItems = Config.Bind("Bot Inventory", "AutoPurchaseItems", true, "Maximum amount of purchases a playerbot can do per stage. Items are purchased directly instead of from chests.");
             MaxBotPurchasesPerStage = Config.Bind("Bot Inventory", "MaxBotPurchasesPerStage", 10, "Maximum amount of putchases a playerbot can do per stage.");
@@ -83,6 +102,7 @@ namespace PlayerBots
             MinBuyingDelay = Config.Bind("Bot Inventory", "MinBuyingDelay", 0f, "Minimum delay in seconds between the time it takes for a bot checks to buy an item.");
             MaxBuyingDelay = Config.Bind("Bot Inventory", "MaxBuyingDelay", 5f, "Maximum delay in seconds between the time it takes for a bot checks to buy an item.");
             ShowBuyMessages = Config.Bind("Bot Inventory", "ShowBuyMessages", true, "Displays whenever a bot buys an item in chat.");
+            ItemBlacklist = Config.Bind("Bot Inventory", "ItemBlacklist", "", "List of item names that bots will never buy.");
 
             HostOnlySpawnBots = Config.Bind("Misc", "HostOnlySpawnBots", true, "Set true so that only the host may spawn bots");
             ShowNameplates = Config.Bind("Misc", "ShowNameplates", true, "Show player nameplates on playerbots if PlayerMode is false. (Host only)");
@@ -92,18 +112,13 @@ namespace PlayerBots
             BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
             ContinueAfterDeathBlacklist = Config.Bind("Player Mode", "ContinueAfterDeathBlacklist", "arena,artifactworld,artifactworld01,artifactworld02,artifactworld03,bazaar,computationalexchange,conduitcanyon,goldshores,meridian,moon,moon2,mysteryspace,solusweb,solutionalhaunt,voidraid,voidstage", "List of stage names where ContinueAfterDeath should be disabled. Only active if PlayerMode and ContinueAfterDeath are true.");
+            EnableDroneSupport = Config.Bind("Player Mode", "EnableDroneSupport", true, "Allow Operator bots to purchase support drones.");
+            EnableDroneSupportAllBots = Config.Bind("Player Mode", "EnableDroneSupportAllBots", false, "Allow all bots to purchase support drones. EnableDroneSupport must be enabled.");
 
             RespawnAfterWave = Config.Bind("Simulacrum", "RespawnAfterWave", false, "Respawns bots after each wave in simulacrum");
 
             BotTeleportDistance = Config.Bind("Misc", "BotTeleportDistance", 100f, "Maximum distance in meters a bot can be from their master player before teleporting to them. Set to 0 to disable teleportation.");
-            EnableDroneSupport = Config.Bind("Player Mode", "EnableDroneSupport", true, "Allow Operator bots to purchase support drones.");
-            EnableDroneSupportAllBots = Config.Bind("Player Mode", "EnableDroneSupportAllBots", false, "Allow all bots to purchase support drones. EnableDroneSupport must be enabled.");
-
-            // Survivor blacklist for random bot spawning
-            SurvivorBlacklist = Config.Bind("Starting Bots", "SurvivorBlacklist", "", "Comma-separated list of survivor names to exclude from random bot spawning. Supports both in-game display names (e.g., 'Chef', 'Mercenary') and technical asset names (e.g., 'GnomeChefBody', 'MercenaryBody'). Leave empty to disable filtering. Use pb_listsurvivors to see available survivor names.");
-
-            // Item blacklist for bot purchases
-            ItemBlacklist = Config.Bind("Bot Inventory", "ItemBlacklist", "", "Comma-separated list of item names that bots will never buy. Leave empty to disable filtering.");
+            EnableTeammateRevivalCompatibility = Config.Bind("Misc", "EnableTeammateRevivalCompatibility", true, "Enable compatibility fixes for TeammateRevival mod. Should prevent SkillDriver null reference errors.");
 
             // Sanity check
             MaxBuyingDelay.Value = Math.Max(MaxBuyingDelay.Value, MinBuyingDelay.Value);
@@ -254,6 +269,14 @@ namespace PlayerBots
                 AIOwnership aiOwnership = gameObject.AddComponent<AIOwnership>() as AIOwnership;
                 aiOwnership.ownerMaster = owner;
 
+                // Add PlayerCharacterMasterController for TeammateRevival compatibility
+                if (EnableTeammateRevivalCompatibility.Value)
+                {
+                    var playerCharacterMasterController = gameObject.AddComponent<PlayerCharacterMasterController>();
+                    
+                    BotLogger.LogInfo("Added PlayerCharacterMasterController for TeammateRevival compatibility");
+                }
+
                 CharacterMaster master = gameObject.GetComponent<CharacterMaster>();
 
                 // Random skin
@@ -359,6 +382,14 @@ namespace PlayerBots
                 AIOwnership aiOwnership = gameObject.AddComponent<AIOwnership>() as AIOwnership;
                 aiOwnership.ownerMaster = owner;
 
+                // Add PlayerCharacterMasterController for TeammateRevival compatibility
+                if (EnableTeammateRevivalCompatibility.Value)
+                {
+                    var playerCharacterMasterController = gameObject.AddComponent<PlayerCharacterMasterController>();
+                    
+                    BotLogger.LogInfo("Added PlayerCharacterMasterController for TeammateRevival compatibility (summon mode)");
+                }
+
                 if (master)
                 {
                     master.name = "PlayerBot";
@@ -440,6 +471,29 @@ namespace PlayerBots
             master.inventory.CopyItemsFrom(owner.inventory);
             master.inventory.RemoveItem(ItemCatalog.FindItemIndex("CaptainDefenseMatrix"), owner.inventory.GetItemCount(ItemCatalog.FindItemIndex("CaptainDefenseMatrix")));
             master.inventory.GiveItem(ItemCatalog.FindItemIndex("DrizzlePlayerHelper"), 1);
+            
+            // DEBUG: Give every bot a Sale Star for testing (REMOVE AFTER TESTING)
+            GiveDebugSaleStar(master);
+        }
+
+        private static void GiveDebugSaleStar(CharacterMaster master)
+        {
+            // Try to find and give Sale Star item
+            ItemIndex saleStarIndex = ItemCatalog.FindItemIndex("LowerPricedChests");
+            if (saleStarIndex == ItemIndex.None)
+            {
+                saleStarIndex = ItemCatalog.FindItemIndex("SaleStar");
+            }
+            
+            if (saleStarIndex != ItemIndex.None)
+            {
+                master.inventory.GiveItem(saleStarIndex, 1);
+                BotLogger.LogInfo($"Gave debug Sale Star to bot {master.name}");
+            }
+            else
+            {
+                BotLogger.LogWarning("Could not find Sale Star item to give to bot");
+            }
         }
 
         private static void SetRandomSkin(CharacterMaster master, GameObject bodyPrefab)
@@ -468,15 +522,67 @@ namespace PlayerBots
                 // Add skill drivers based on class
                 skillHelper.InjectSkills(gameObject, ai);
 
-                // Set new skill drivers
-                PropertyInfo property = typeof(BaseAI).GetProperty("skillDrivers");
-                property.DeclaringType.GetProperty("skillDrivers");
-                property.SetValue(ai, gameObject.GetComponents<AISkillDriver>(), BindingFlags.NonPublic | BindingFlags.Instance, null, null, null);
+                // Get the newly injected skill drivers and properly replace them using BaseAI method
+                AISkillDriver[] newSkillDrivers = gameObject.GetComponents<AISkillDriver>();
+                if (newSkillDrivers != null && newSkillDrivers.Length > 0)
+                {
+                    // Filter out null skill drivers before setting them
+                    var validSkillDrivers = new List<AISkillDriver>();
+                    int nullCount = 0;
+                    
+                    for (int i = 0; i < newSkillDrivers.Length; i++)
+                    {
+                        if (newSkillDrivers[i] != null)
+                        {
+                            validSkillDrivers.Add(newSkillDrivers[i]);
+                        }
+                        else
+                        {
+                            nullCount++;
+                        }
+                    }
+                    
+                    if (validSkillDrivers.Count > 0)
+                    {
+                        // Use the proper BaseAI method to replace skill drivers
+                        ai.ReplaceSkillDrivers(validSkillDrivers.ToArray());
+                    }
+                }
+                else
+                {
+                    BotLogger.LogWarning("No skill drivers found after injection!");
+                }
             }
             else
             {
-                // Add  skills
+                // Add default skills
                 skillHelper.AddDefaultSkills(gameObject, ai, 0);
+                
+                // Get the skill drivers and replace them
+                AISkillDriver[] defaultSkillDrivers = gameObject.GetComponents<AISkillDriver>();
+                if (defaultSkillDrivers != null && defaultSkillDrivers.Length > 0)
+                {
+                    // Filter out null skill drivers before setting them
+                    var validSkillDrivers = new List<AISkillDriver>();
+                    int nullCount = 0;
+                    
+                    for (int i = 0; i < defaultSkillDrivers.Length; i++)
+                    {
+                        if (defaultSkillDrivers[i] != null)
+                        {
+                            validSkillDrivers.Add(defaultSkillDrivers[i]);
+                        }
+                        else
+                        {
+                            nullCount++;
+                        }
+                    }
+                    
+                    if (validSkillDrivers.Count > 0)
+                    {
+                        ai.ReplaceSkillDrivers(validSkillDrivers.ToArray());
+                    }
+                }
             }
 
             // Set BaseAI properties
@@ -492,6 +598,13 @@ namespace PlayerBots
             // Add playerbot controller for extra behaviors and fixes
             PlayerBotController controller = gameObject.AddComponent<PlayerBotController>();
             controller.SetSkillHelper(skillHelper);
+
+            // Force skill driver re-initialization after a short delay if TeammateRevival compatibility is enabled
+            if (EnableTeammateRevivalCompatibility.Value)
+            {
+                gameObject.AddComponent<BotSkillDriverInitializer>();
+                gameObject.AddComponent<SafeSkillDriverEvaluator>();
+            }
         }
 
         public static void SpawnPlayerbots(CharacterMaster owner, SurvivorIndex characterType, int amount)
@@ -1099,5 +1212,7 @@ namespace PlayerBots
             NetworkUser user = args.sender;
             user.master.TrueKill();
         }
+
+
     }
 }
