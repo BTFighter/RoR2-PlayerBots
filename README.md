@@ -1,5 +1,11 @@
 # RoR2-PlayerBots
-A fork of a mod for Risk of Rain 2 with added features and custom character support for:  
+A fork of a mod for Risk of Rain 2 with added features and custom character support.
+
+Works for all DLCs, including Alloyed Collective.  
+  
+Have an issue? Report at [https://github.com/BTFighter/RoR2-PlayerBots](https://github.com/BTFighter/RoR2-PlayerBots-Issues/issues).  
+
+Supported Custom Characters:  
 [Alien Hominid](https://thunderstore.io/package/TheTimesweeper/Alien_Hominid/)  
 [Arsonist](https://thunderstore.io/package/PopcornFactory/Arsonist_Mod/)  
 [Assassin](https://thunderstore.io/package/HasteReapr/AssassinMod/)  
@@ -53,9 +59,8 @@ Disabled for now:
 [Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
 [Seamstress](https://thunderstore.io/package/tsuyoikenko/Seamstress/)  
 
-If anybody wants to improve these Custom AI Scripts, you can create a pull request.
+If anybody wants to improve these Custom AI Scripts, you can create a pull request.  
 
-Works for all DLCs, including Alloyed Collective.
-Check the [original mod](https://thunderstore.io/package/Meledy/PlayerBots/) and it's [Github Repository](https://github.com/Melledy/RoR2-PlayerBots).
+You can check out the [original mod](https://thunderstore.io/package/Meledy/PlayerBots/) and it's [Github Repository](https://github.com/Melledy/RoR2-PlayerBots).  
 
 DISCLAIMER: This fork uses AI to generate code for fixes/additions.
