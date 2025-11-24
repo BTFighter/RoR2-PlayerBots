@@ -445,29 +445,6 @@ namespace PlayerBots
             master.inventory.CopyItemsFrom(owner.inventory);
             master.inventory.RemoveItem(ItemCatalog.FindItemIndex("CaptainDefenseMatrix"), owner.inventory.GetItemCount(ItemCatalog.FindItemIndex("CaptainDefenseMatrix")));
             master.inventory.GiveItem(ItemCatalog.FindItemIndex("DrizzlePlayerHelper"), 1);
-            
-            // DEBUG: Give every bot a Sale Star for testing (REMOVE AFTER TESTING)
-            GiveDebugSaleStar(master);
-        }
-
-        private static void GiveDebugSaleStar(CharacterMaster master)
-        {
-            // Try to find and give Sale Star item
-            ItemIndex saleStarIndex = ItemCatalog.FindItemIndex("LowerPricedChests");
-            if (saleStarIndex == ItemIndex.None)
-            {
-                saleStarIndex = ItemCatalog.FindItemIndex("SaleStar");
-            }
-            
-            if (saleStarIndex != ItemIndex.None)
-            {
-                master.inventory.GiveItem(saleStarIndex, 1);
-                BotLogger.LogInfo($"Gave debug Sale Star to bot {master.name}");
-            }
-            else
-            {
-                BotLogger.LogWarning("Could not find Sale Star item to give to bot");
-            }
         }
 
         private static void SetRandomSkin(CharacterMaster master, GameObject bodyPrefab)

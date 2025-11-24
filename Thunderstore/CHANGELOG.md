@@ -6,7 +6,8 @@
 	- Added item blacklist.
 		- List items you don't want bots to buy.
 	- Improved Drifter AI
-	- Sale Star is now functional for bots.
+	- Sale Star is now functional for bots, even without BotsUseInteractables enabled.
+	- Disabled BotsUseInteractables for now, currently broken.
 - **0.9.7 (ror2 1.4.0)**
 	- Operator can now buy drones.
         - Can be adjusted in the config. Set to 0 to disable this feature.
