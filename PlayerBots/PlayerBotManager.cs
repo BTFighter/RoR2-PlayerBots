@@ -89,7 +89,7 @@ namespace PlayerBots
 
             PlayerMode = Config.Bind("Player Mode", "PlayerMode", false, "Makes the game treat playerbots like how regular players are treated. The bots now show up on the scoreboard, can pick up items, influence the map scaling, etc.");
             DontScaleInteractables = Config.Bind("Player Mode", "DontScaleInteractables", true, "Prevents interactables spawn count from scaling with bots. Only active is PlayerMode is true.");
-            BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true.");
+            BotsUseInteractables = Config.Bind("Player Mode", "BotsUseInteractables", false, "[Experimental] Allow bots to use interactables, such as buying from a chest and picking up items on the ground. Only active is PlayerMode is true. [TEMPORARILY DISABLED - BROKEN]");
             ContinueAfterDeath = Config.Bind("Player Mode", "ContinueAfterDeath", false, "Bots will activate and use teleporters when all real players die. Only active is PlayerMode is true.");
             ContinueAfterDeathBlacklist = Config.Bind("Player Mode", "ContinueAfterDeathBlacklist", "arena,artifactworld,artifactworld01,artifactworld02,artifactworld03,bazaar,computationalexchange,conduitcanyon,goldshores,meridian,moon,moon2,mysteryspace,solusweb,solutionalhaunt,voidraid,voidstage", "List of stage names where ContinueAfterDeath should be disabled. Only active if PlayerMode and ContinueAfterDeath are true.");
 

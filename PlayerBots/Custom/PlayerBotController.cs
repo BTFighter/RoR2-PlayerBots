@@ -61,7 +61,9 @@ namespace PlayerBots.Custom
 
         public bool CanInteract()
         {
-            return customTargetSkillDriver != null && PlayerBotManager.BotsUseInteractables.Value;
+            // TEMPORARILY DISABLED - BotsUseInteractables is broken
+            return false;
+            // return customTargetSkillDriver != null && PlayerBotManager.BotsUseInteractables.Value;
         }
 
         private void UpdateMasterFollowing()
