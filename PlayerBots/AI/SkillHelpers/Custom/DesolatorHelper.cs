@@ -4,29 +4,28 @@ using UnityEngine;
 namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("DesolatorBody")]
-    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/Red_Alert/", "3.2.3")]
+    [CustomSurvivor("https://thunderstore.io/package/TheTimesweeper/Red_Alert/", "3.3.7")]
     class DesolatorHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {
             // Skills
-            /*AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            skill4.customName = "DeployTeslaCoil";
+            AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            skill4.customName = "DeployTurret";
             skill4.skillSlot = RoR2.SkillSlot.Special;
             skill4.requireSkillReady = true;
             skill4.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
             skill4.minDistance = 0;
-            skill4.maxDistance = 50;
-            skill4.minUserHealthFraction = .9f;
+            skill4.maxDistance = 60;
             skill4.selectionRequiresTargetLoS = true;
-            skill4.activationRequiresTargetLoS = true;
+            skill4.activationRequiresTargetLoS = false;
             skill4.activationRequiresAimConfirmation = false;
             skill4.movementType = AISkillDriver.MovementType.StrafeMovetarget;
             skill4.aimType = AISkillDriver.AimType.AtMoveTarget;
             skill4.ignoreNodeGraph = true;
             skill4.resetCurrentEnemyOnNextDriverSelection = false;
             skill4.noRepeat = true;
-            skill4.shouldSprint = false;*/
+            skill4.shouldSprint = false;
 
             AISkillDriver skill3 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
             skill3.customName = "Utility";

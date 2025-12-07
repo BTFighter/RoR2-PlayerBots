@@ -1,0 +1,212 @@
+
+using Modules.Characters;
+using RoR2;
+using RoR2.CharacterAI;
+using UnityEngine;
+
+namespace PlayerBots.AI.SkillHelpers.Custom.Disabled
+{
+    [SkillHelperSurvivor("RA2ChronoBody")]
+    [CustomSurvivor("https://thunderstore.io/c/riskofrain2/p/TheTimesweeper/Red_Alert/", "3.3.7")]
+    class ChronoLegionnaireHelper : AiSkillHelper
+    {
+        public override void InjectSkills(GameObject gameObject, BaseAI ai)
+        {
+            ai.aimVectorDampTime = 0.01f;
+            ai.aimVectorMaxSpeed = 360f;
+
+            // Primary: ChronoShoot - Precision rifle for medium to long range combat
+            AISkillDriver primaryClose = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            primaryClose.customName = "Primary Close Range";
+            primaryClose.skillSlot = SkillSlot.Primary;
+            primaryClose.requireSkillReady = false;
+            primaryClose.minDistance = 0;
+            primaryClose.maxDistance = 10;
+            primaryClose.selectionRequiresTargetLoS = false;
+            primaryClose.selectionRequiresOnGround = false;
+            primaryClose.selectionRequiresAimTarget = false;
+            primaryClose.maxTimesSelected = -1;
+            primaryClose.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            primaryClose.activationRequiresTargetLoS = false;
+            primaryClose.activationRequiresAimTargetLoS = false;
+            primaryClose.activationRequiresAimConfirmation = true;
+            primaryClose.movementType = AISkillDriver.MovementType.FleeMoveTarget;
+            primaryClose.moveInputScale = 1;
+            primaryClose.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            primaryClose.ignoreNodeGraph = false;
+            primaryClose.shouldSprint = false;
+            primaryClose.shouldFireEquipment = false;
+            primaryClose.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            primaryClose.driverUpdateTimerOverride = -1;
+            primaryClose.resetCurrentEnemyOnNextDriverSelection = false;
+            primaryClose.noRepeat = false;
+            primaryClose.nextHighPriorityOverride = null;
+
+            // Primary: ChronoShoot - Strafe and shoot at medium range
+            AISkillDriver primary = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            primary.customName = "Primary Strafe";
+            primary.skillSlot = SkillSlot.Primary;
+            primary.requireSkillReady = false;
+            primary.minDistance = 5;
+            primary.maxDistance = 45;
+            primary.selectionRequiresTargetLoS = false;
+            primary.selectionRequiresOnGround = false;
+            primary.selectionRequiresAimTarget = false;
+            primary.maxTimesSelected = -1;
+            primary.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            primary.activationRequiresTargetLoS = false;
+            primary.activationRequiresAimTargetLoS = false;
+            primary.activationRequiresAimConfirmation = true;
+            primary.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            primary.moveInputScale = 1;
+            primary.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            primary.ignoreNodeGraph = false;
+            primary.shouldSprint = false;
+            primary.shouldFireEquipment = false;
+            primary.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            primary.driverUpdateTimerOverride = -1;
+            primary.resetCurrentEnemyOnNextDriverSelection = false;
+            primary.noRepeat = false;
+            primary.nextHighPriorityOverride = null;
+
+            // Secondary: ChronoBombPlace - Place bombs at close to medium range
+            AISkillDriver secondary = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            secondary.customName = "Secondary Bomb Placement";
+            secondary.skillSlot = SkillSlot.Secondary;
+            secondary.requireSkillReady = true;
+            secondary.minDistance = 0;
+            secondary.maxDistance = 15;
+            secondary.selectionRequiresTargetLoS = false;
+            secondary.selectionRequiresOnGround = false;
+            secondary.selectionRequiresAimTarget = false;
+            secondary.maxTimesSelected = -1;
+            secondary.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            secondary.activationRequiresTargetLoS = false;
+            secondary.activationRequiresAimTargetLoS = false;
+            secondary.activationRequiresAimConfirmation = false;
+            secondary.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            secondary.moveInputScale = 1;
+            secondary.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            secondary.ignoreNodeGraph = true;
+            secondary.shouldSprint = false;
+            secondary.shouldFireEquipment = false;
+            secondary.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
+            secondary.driverUpdateTimerOverride = -1;
+            secondary.resetCurrentEnemyOnNextDriverSelection = false;
+            secondary.noRepeat = false;
+            secondary.nextHighPriorityOverride = null;
+
+            // Special: Chronosphere/VanishTether - Time manipulation for medium range
+            AISkillDriver special = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            special.customName = "Special Chronosphere";
+            special.skillSlot = SkillSlot.Special;
+            special.requireSkillReady = true;
+            special.minDistance = 5;
+            special.maxDistance = 25;
+            special.selectionRequiresTargetLoS = false;
+            special.selectionRequiresOnGround = false;
+            special.selectionRequiresAimTarget = false;
+            special.maxTimesSelected = -1;
+            special.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            special.activationRequiresTargetLoS = false;
+            special.activationRequiresAimTargetLoS = false;
+            special.activationRequiresAimConfirmation = true;
+            special.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            special.moveInputScale = 1;
+            special.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            special.ignoreNodeGraph = false;
+            special.shouldSprint = false;
+            special.shouldFireEquipment = false;
+            special.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            special.driverUpdateTimerOverride = -1;
+            special.resetCurrentEnemyOnNextDriverSelection = false;
+            special.noRepeat = false;
+            special.nextHighPriorityOverride = null;
+
+            // Utility: Sprint/Time Movement - Use for repositioning at medium to far range
+            AISkillDriver sprintDriver = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            sprintDriver.customName = "Utility Sprint";
+            sprintDriver.skillSlot = SkillSlot.None;
+            sprintDriver.requireSkillReady = false;
+            sprintDriver.minDistance = 40;
+            sprintDriver.maxDistance = 80;
+            sprintDriver.selectionRequiresTargetLoS = false;
+            sprintDriver.selectionRequiresOnGround = true;
+            sprintDriver.selectionRequiresAimTarget = true;
+            sprintDriver.maxTimesSelected = -1;
+            sprintDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            sprintDriver.activationRequiresTargetLoS = false;
+            sprintDriver.activationRequiresAimTargetLoS = false;
+            sprintDriver.activationRequiresAimConfirmation = false;
+            sprintDriver.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            sprintDriver.moveInputScale = 1;
+            sprintDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
+            sprintDriver.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+            sprintDriver.shouldSprint = true;
+            sprintDriver.ignoreNodeGraph = false;
+            sprintDriver.driverUpdateTimerOverride = -1;
+            sprintDriver.resetCurrentEnemyOnNextDriverSelection = false;
+            sprintDriver.noRepeat = true;
+            sprintDriver.nextHighPriorityOverride = null;
+
+            // Don't sprint when too close to avoid getting overwhelmed
+            AISkillDriver closeRangeChase = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            closeRangeChase.customName = "Close Range Chase";
+            closeRangeChase.skillSlot = SkillSlot.None;
+            closeRangeChase.requireSkillReady = false;
+            closeRangeChase.minDistance = 0;
+            closeRangeChase.maxDistance = 40;
+            closeRangeChase.selectionRequiresTargetLoS = false;
+            closeRangeChase.selectionRequiresOnGround = false;
+            closeRangeChase.selectionRequiresAimTarget = true;
+            closeRangeChase.maxTimesSelected = -1;
+            closeRangeChase.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            closeRangeChase.activationRequiresTargetLoS = false;
+            closeRangeChase.activationRequiresAimTargetLoS = false;
+            closeRangeChase.activationRequiresAimConfirmation = false;
+            closeRangeChase.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            closeRangeChase.moveInputScale = 1;
+            closeRangeChase.aimType = AISkillDriver.AimType.AtMoveTarget;
+            closeRangeChase.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+            closeRangeChase.shouldSprint = false;
+            closeRangeChase.ignoreNodeGraph = false;
+            closeRangeChase.driverUpdateTimerOverride = -1;
+            closeRangeChase.resetCurrentEnemyOnNextDriverSelection = false;
+            closeRangeChase.noRepeat = true;
+            closeRangeChase.nextHighPriorityOverride = null;
+
+            // Stop sprinting when far away
+            AISkillDriver stopSprint = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
+            stopSprint.customName = "Stop Sprinting Far";
+            stopSprint.skillSlot = SkillSlot.None;
+            stopSprint.requireSkillReady = false;
+            stopSprint.minDistance = 80;
+            stopSprint.maxDistance = float.PositiveInfinity;
+            stopSprint.selectionRequiresTargetLoS = false;
+            stopSprint.selectionRequiresOnGround = false;
+            stopSprint.selectionRequiresAimTarget = false;
+            stopSprint.maxTimesSelected = -1;
+            stopSprint.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            stopSprint.activationRequiresTargetLoS = false;
+            stopSprint.activationRequiresAimTargetLoS = false;
+            stopSprint.activationRequiresAimConfirmation = false;
+            stopSprint.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            stopSprint.moveInputScale = 1;
+            stopSprint.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            stopSprint.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+            stopSprint.shouldSprint = false;
+            stopSprint.ignoreNodeGraph = false;
+            stopSprint.driverUpdateTimerOverride = -1;
+            stopSprint.resetCurrentEnemyOnNextDriverSelection = false;
+            stopSprint.noRepeat = false;
+
+            // Set up skill chain priorities for proper AI behavior
+            // Primary skills should trigger before secondary/special
+            primaryClose.nextHighPriorityOverride = secondary;
+            primary.nextHighPriorityOverride = secondary;
+
+            // Add default skills for fallback behavior
+            AddDefaultSkills(gameObject, ai, 10);
+        }
+    }
+}

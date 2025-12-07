@@ -19,6 +19,7 @@ A fork of a mod for Risk of Rain 2 with added features and custom character supp
 [Lee Hyperreal](https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/)    
 [Nemesis Commando](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/)   
 [Nemesis Mercenary](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/)  
+[Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
 [Pathfinder](https://thunderstore.io/package/Bog/Pathfinder/)  
 [Pilot](https://thunderstore.io/package/EnforcerGang/Pilot/)  
 [Ravager](https://thunderstore.io/package/public_ParticleSystem/Ravager/)   
@@ -27,6 +28,7 @@ A fork of a mod for Risk of Rain 2 with added features and custom character supp
 [Rocket (Raccoon)](https://thunderstore.io/package/VCR/RocketRaccoon/)  
 [Scout](https://thunderstore.io/package/tsuyoikenko/Scout/)  
 [Sett](https://thunderstore.io/package/lemonlust/SettMod/)  
+[Shock Trooper](https://thunderstore.io/package/The_Constellate/Shock_Trooper/)
 [Sorceress](https://thunderstore.io/package/Frosthex/SorceressMod/)  
 [Spy](https://thunderstore.io/package/tsuyoikenko/Spy/)   
 [Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/)   
@@ -50,7 +52,7 @@ Deprecated characters for older versions:
 
 Disabled for now:  
 [Builder](https://thunderstore.io/package/DragonycksModdingComms/Builder/)  
-[Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/)  
+[Chrono Legionnaire](https://thunderstore.io/package/TheTimesweeper/Red_Alert/)
 [Seamstress](https://thunderstore.io/package/tsuyoikenko/Seamstress/)  
 
 If anybody wants to improve these Custom AI Scripts, you can create a pull request.

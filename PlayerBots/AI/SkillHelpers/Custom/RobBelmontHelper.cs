@@ -5,7 +5,7 @@ namespace PlayerBots.AI.SkillHelpers.Custom
 {
     [SkillHelperSurvivor("RobBelmontBody")]
     [CustomSurvivor("https://thunderstore.io/package/public_ParticleSystem/Belmont/", "2.1.8")]
-    class NemesisEnforcerHelper : AiSkillHelper
+    class RobBelmontHelper : AiSkillHelper
     {
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {

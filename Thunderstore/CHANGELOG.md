@@ -1,3 +1,14 @@
+- **0.9.9 (ror2 1.4.0)**
+	- Improved AI for the ff:
+		- Drifter
+		- Celestial War Tank
+		- Desolator
+		- Enforcer
+		- Operator
+		- Credit and thanks to ImprovedSurvivorAI for Drifter and Operator.
+	- Added support for the ff:
+		- Nemesis Enforcer
+		- Shock Trooper
 - **0.9.8 (ror2 1.4.0)**
 	- Added ContinueAfterDeath blacklist.
         - List stages that you don't want ContinueAfterDeath to be enabled.

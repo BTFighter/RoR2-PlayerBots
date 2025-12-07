@@ -7,290 +7,405 @@ namespace PlayerBots.AI.SkillHelpers
     [SkillHelperSurvivor("DrifterBody")]
     class DrifterHelper : AiSkillHelper
     {
-        private DrifterBagController bagController;
-        private AISkillDriver primarySkillDriver;
-        private AISkillDriver utilitySkillDriver;
-        private AISkillDriver[] allSkillDrivers;
-        
-        // Track swings for throw logic
-        private int swingCount = 0;
-        private bool wasBagFull = false;
-        private float throwChance = 0.35f; // 35% chance to throw after 2 swings
-        private int swingsBeforeThrow = 2;
-
         public override void InjectSkills(GameObject gameObject, BaseAI ai)
         {
-            AISkillDriver skill4 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            skill4.customName = "Special";
-            skill4.skillSlot = RoR2.SkillSlot.Special;
-            skill4.requireSkillReady = true;
-            skill4.moveTargetType = AISkillDriver.TargetType.NearestFriendlyInSkillRange;
-            skill4.minDistance = 0;
-            skill4.maxDistance = 15;
-            skill4.selectionRequiresTargetLoS = true;
-            skill4.activationRequiresTargetLoS = true;
-            skill4.activationRequiresAimConfirmation = true;
-            skill4.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            skill4.aimType = AISkillDriver.AimType.AtCurrentLeader;
-            skill4.ignoreNodeGraph = false;
-            skill4.resetCurrentEnemyOnNextDriverSelection = false;
-            skill4.noRepeat = true;
-            skill4.shouldSprint = false;
+            if (ai != null)
+            {
+                ai.neverRetaliateFriendlies = true;
+                ai.aimVectorDampTime = 0.05f;
+                ai.aimVectorMaxSpeed = 3600f;
+            }
 
-            // Utility driver for throwing bagged entities
-            utilitySkillDriver = gameObject.AddComponent<AISkillDriver>();
-            utilitySkillDriver.customName = "UtilityThrow";
-            utilitySkillDriver.skillSlot = RoR2.SkillSlot.Utility;
-            utilitySkillDriver.requireSkillReady = true;
-            utilitySkillDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            utilitySkillDriver.minDistance = 0f;
-            utilitySkillDriver.maxDistance = 999f; // Will be controlled dynamically
-            utilitySkillDriver.selectionRequiresTargetLoS = false;
-            utilitySkillDriver.activationRequiresTargetLoS = false;
-            utilitySkillDriver.activationRequiresAimConfirmation = true;
-            utilitySkillDriver.movementType = AISkillDriver.MovementType.StrafeMovetarget;
-            utilitySkillDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
-            utilitySkillDriver.ignoreNodeGraph = false;
-            utilitySkillDriver.resetCurrentEnemyOnNextDriverSelection = false;
-            utilitySkillDriver.noRepeat = false;
-            utilitySkillDriver.shouldSprint = false;
-            utilitySkillDriver.buttonPressType = AISkillDriver.ButtonPressType.Hold;
-            utilitySkillDriver.driverUpdateTimerOverride = 0.5f;
+            // Repossess Slam - Primary skill for close range combat (like SuffocateSlam)
+            AISkillDriver repossessSlam = gameObject.AddComponent<AISkillDriver>();
+            repossessSlam.customName = "RepossessSlam";
+            repossessSlam.skillSlot = SkillSlot.Primary;
+            repossessSlam.requireSkillReady = true;
+            repossessSlam.requireEquipmentReady = false;
+            repossessSlam.moveTargetType = AISkillDriver.TargetType.Custom;
+            repossessSlam.minDistance = 0f;
+            repossessSlam.maxDistance = float.PositiveInfinity;
+            repossessSlam.selectionRequiresTargetLoS = false;
+            repossessSlam.activationRequiresTargetLoS = false;
+            repossessSlam.activationRequiresAimConfirmation = false;
+            repossessSlam.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            repossessSlam.aimType = AISkillDriver.AimType.AtMoveTarget;
+            repossessSlam.ignoreNodeGraph = false;
+            repossessSlam.noRepeat = false;
+            repossessSlam.shouldSprint = false;
+            repossessSlam.shouldFireEquipment = false;
+            repossessSlam.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            repossessSlam.driverUpdateTimerOverride = 1f;
 
-            AISkillDriver utilityDriver = gameObject.AddComponent<AISkillDriver>();
-            utilityDriver.customName = "Utility";
-            utilityDriver.skillSlot = RoR2.SkillSlot.Utility;
-            utilityDriver.requireSkillReady = true;
-            utilityDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            utilityDriver.minDistance = 35f;
-            utilityDriver.maxDistance = 120f;
-            utilityDriver.selectionRequiresTargetLoS = true;
-            utilityDriver.activationRequiresTargetLoS = true;
-            utilityDriver.activationRequiresAimConfirmation = true;
-            utilityDriver.movementType = AISkillDriver.MovementType.StrafeMovetarget;
-            utilityDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
-            utilityDriver.ignoreNodeGraph = false;
-            utilityDriver.resetCurrentEnemyOnNextDriverSelection = true;
-            utilityDriver.noRepeat = false;
-            utilityDriver.shouldSprint = false;
-            utilityDriver.buttonPressType = AISkillDriver.ButtonPressType.Hold;
-            utilityDriver.driverUpdateTimerOverride = 0.5f;
+            // Repossess Throw - Utility skill for throwing bagged entities (like EmptyBag)
+            AISkillDriver repossessThrow = gameObject.AddComponent<AISkillDriver>();
+            repossessThrow.customName = "RepossessThrow";
+            repossessThrow.skillSlot = SkillSlot.Utility;
+            repossessThrow.requireSkillReady = true;
+            repossessThrow.requireEquipmentReady = false;
+            repossessThrow.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            repossessThrow.minDistance = 10f;
+            repossessThrow.maxDistance = 40f;
+            repossessThrow.selectionRequiresTargetLoS = true;
+            repossessThrow.activationRequiresTargetLoS = true;
+            repossessThrow.activationRequiresAimConfirmation = true;
+            repossessThrow.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            repossessThrow.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            repossessThrow.ignoreNodeGraph = false;
+            repossessThrow.noRepeat = true;
+            repossessThrow.shouldSprint = false;
+            repossessThrow.shouldFireEquipment = false;
+            repossessThrow.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            repossessThrow.driverUpdateTimerOverride = 0.1f;
 
-            AISkillDriver utilityReleaseDriver = gameObject.AddComponent<AISkillDriver>();
-            utilityReleaseDriver.customName = "UtilityRelease";
-            utilityReleaseDriver.skillSlot = RoR2.SkillSlot.Utility;
-            utilityReleaseDriver.requireSkillReady = false;
-            utilityReleaseDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            utilityReleaseDriver.minDistance = 0f;
-            utilityReleaseDriver.maxDistance = 45f;
-            utilityReleaseDriver.selectionRequiresTargetLoS = true;
-            utilityReleaseDriver.activationRequiresTargetLoS = true;
-            utilityReleaseDriver.activationRequiresAimConfirmation = true;
-            utilityReleaseDriver.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            utilityReleaseDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
-            utilityReleaseDriver.ignoreNodeGraph = false;
-            utilityReleaseDriver.resetCurrentEnemyOnNextDriverSelection = false;
-            utilityReleaseDriver.noRepeat = true;
-            utilityReleaseDriver.shouldSprint = true;
-            utilityReleaseDriver.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
+            // Tornado Slam End - Primary skill for tornado finish (like BluntForceTornado)
+            AISkillDriver tornadoSlamEnd = gameObject.AddComponent<AISkillDriver>();
+            tornadoSlamEnd.customName = "TornadoSlamEnd";
+            tornadoSlamEnd.skillSlot = SkillSlot.Primary;
+            tornadoSlamEnd.requireSkillReady = true;
+            tornadoSlamEnd.requireEquipmentReady = false;
+            tornadoSlamEnd.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            tornadoSlamEnd.minDistance = 0f;
+            tornadoSlamEnd.maxDistance = 5f;
+            tornadoSlamEnd.selectionRequiresTargetLoS = false;
+            tornadoSlamEnd.activationRequiresTargetLoS = false;
+            tornadoSlamEnd.activationRequiresAimConfirmation = false;
+            tornadoSlamEnd.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            tornadoSlamEnd.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            tornadoSlamEnd.ignoreNodeGraph = true;
+            tornadoSlamEnd.noRepeat = false;
+            tornadoSlamEnd.shouldSprint = false;
+            tornadoSlamEnd.shouldFireEquipment = false;
+            tornadoSlamEnd.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
 
-            AISkillDriver skill2 = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            skill2.customName = "Secondary";
-            skill2.skillSlot = RoR2.SkillSlot.Secondary;
-            skill2.requireSkillReady = true;
-            skill2.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            skill2.minDistance = 0;
-            skill2.maxDistance = 30;
-            skill2.selectionRequiresTargetLoS = true;
-            skill2.activationRequiresTargetLoS = true;
-            skill2.activationRequiresAimConfirmation = true;
-            skill2.movementType = AISkillDriver.MovementType.StrafeMovetarget;
-            skill2.aimType = AISkillDriver.AimType.AtMoveTarget;
-            skill2.ignoreNodeGraph = false;
-            skill2.resetCurrentEnemyOnNextDriverSelection = false;
-            skill2.noRepeat = false;
-            skill2.shouldSprint = false;
+            // Salvage - Special skill for healing/support
+            AISkillDriver salvage = gameObject.AddComponent<AISkillDriver>();
+            salvage.customName = "Salvage";
+            salvage.skillSlot = SkillSlot.Special;
+            salvage.requireSkillReady = true;
+            salvage.requireEquipmentReady = false;
+            salvage.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            salvage.minDistance = 0f;
+            salvage.maxDistance = float.PositiveInfinity;
+            salvage.selectionRequiresTargetLoS = false;
+            salvage.activationRequiresTargetLoS = false;
+            salvage.activationRequiresAimConfirmation = false;
+            salvage.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            salvage.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            salvage.ignoreNodeGraph = false;
+            salvage.noRepeat = false;
+            salvage.shouldSprint = false;
+            salvage.shouldFireEquipment = false;
+            salvage.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
+            salvage.driverUpdateTimerOverride = 1.5f;
 
-            AISkillDriver chaseSkill = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            chaseSkill.customName = "ChaseTarget";
-            chaseSkill.skillSlot = RoR2.SkillSlot.None;
-            chaseSkill.requireSkillReady = false;
-            chaseSkill.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            chaseSkill.minDistance = 20;
-            chaseSkill.maxDistance = 60;
-            chaseSkill.selectionRequiresTargetLoS = true;
-            chaseSkill.activationRequiresTargetLoS = true;
-            chaseSkill.activationRequiresAimConfirmation = false;
-            chaseSkill.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            chaseSkill.aimType = AISkillDriver.AimType.AtMoveTarget;
-            chaseSkill.ignoreNodeGraph = false;
-            chaseSkill.resetCurrentEnemyOnNextDriverSelection = false;
-            chaseSkill.noRepeat = false;
-            chaseSkill.shouldSprint = true;
+            // Repossess - Main utility skill for capturing enemies
+            AISkillDriver repossess = gameObject.AddComponent<AISkillDriver>();
+            repossess.customName = "Repossess";
+            repossess.skillSlot = SkillSlot.Utility;
+            repossess.requireSkillReady = true;
+            repossess.requireEquipmentReady = false;
+            repossess.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            repossess.minDistance = 0f;
+            repossess.maxDistance = 20f;
+            repossess.selectionRequiresTargetLoS = true;
+            repossess.activationRequiresTargetLoS = true;
+            repossess.activationRequiresAimConfirmation = true;
+            repossess.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            repossess.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            repossess.ignoreNodeGraph = false;
+            repossess.noRepeat = false;
+            repossess.shouldSprint = false;
+            repossess.shouldFireEquipment = false;
+            repossess.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
+            repossess.driverUpdateTimerOverride = 0.5f;
 
-            // Primary skill - will be used when bag is full
-            primarySkillDriver = gameObject.AddComponent<AISkillDriver>() as AISkillDriver;
-            primarySkillDriver.customName = "Primary";
-            primarySkillDriver.skillSlot = RoR2.SkillSlot.Primary;
-            primarySkillDriver.requireSkillReady = false; // Don't require ready so it can spam
-            primarySkillDriver.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
-            primarySkillDriver.minDistance = 0;
-            primarySkillDriver.maxDistance = 10;
-            primarySkillDriver.selectionRequiresTargetLoS = false; // Don't require LOS when bagged
-            primarySkillDriver.activationRequiresTargetLoS = false; // Don't require LOS when bagged
-            primarySkillDriver.activationRequiresAimConfirmation = false;
-            primarySkillDriver.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
-            primarySkillDriver.aimType = AISkillDriver.AimType.AtMoveTarget;
-            primarySkillDriver.ignoreNodeGraph = true;
-            primarySkillDriver.resetCurrentEnemyOnNextDriverSelection = false;
-            primarySkillDriver.noRepeat = false;
-            primarySkillDriver.shouldSprint = false;
-            primarySkillDriver.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
+            // Tornado Slam - Utility skill for AoE (like TornadoSlam)
+            AISkillDriver tornadoSlam = gameObject.AddComponent<AISkillDriver>();
+            tornadoSlam.customName = "TornadoSlam";
+            tornadoSlam.skillSlot = SkillSlot.Utility;
+            tornadoSlam.requireSkillReady = true;
+            tornadoSlam.requireEquipmentReady = false;
+            tornadoSlam.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            tornadoSlam.minDistance = 20f;
+            tornadoSlam.maxDistance = 100f;
+            tornadoSlam.selectionRequiresTargetLoS = true;
+            tornadoSlam.activationRequiresTargetLoS = true;
+            tornadoSlam.activationRequiresAimConfirmation = true;
+            tornadoSlam.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            tornadoSlam.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            tornadoSlam.ignoreNodeGraph = true;
+            tornadoSlam.noRepeat = true;
+            tornadoSlam.shouldSprint = false;
+            tornadoSlam.shouldFireEquipment = false;
+            tornadoSlam.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            tornadoSlam.driverUpdateTimerOverride = 1f;
 
-            // Add default skills
+            // Cleanup - Secondary skill for area damage (like Cleanup)
+            AISkillDriver cleanup = gameObject.AddComponent<AISkillDriver>();
+            cleanup.customName = "Cleanup";
+            cleanup.skillSlot = SkillSlot.Secondary;
+            cleanup.requireSkillReady = true;
+            cleanup.requireEquipmentReady = false;
+            cleanup.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            cleanup.minDistance = 5f;
+            cleanup.maxDistance = 50f;
+            cleanup.selectionRequiresTargetLoS = true;
+            cleanup.activationRequiresTargetLoS = true;
+            cleanup.activationRequiresAimConfirmation = true;
+            cleanup.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            cleanup.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            cleanup.ignoreNodeGraph = true;
+            cleanup.noRepeat = true;
+            cleanup.shouldSprint = false;
+            cleanup.shouldFireEquipment = false;
+            cleanup.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            cleanup.driverUpdateTimerOverride = 0.1f;
+
+            // Spawn Cube - Secondary skill for summoning (like JunkCube)
+            AISkillDriver spawnCube = gameObject.AddComponent<AISkillDriver>();
+            spawnCube.customName = "SpawnCube";
+            spawnCube.skillSlot = SkillSlot.Secondary;
+            spawnCube.requireSkillReady = true;
+            spawnCube.requireEquipmentReady = false;
+            spawnCube.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            spawnCube.minDistance = 5f;
+            spawnCube.maxDistance = 60f;
+            spawnCube.selectionRequiresTargetLoS = true;
+            spawnCube.activationRequiresTargetLoS = true;
+            spawnCube.activationRequiresAimConfirmation = false;
+            spawnCube.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            spawnCube.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            spawnCube.ignoreNodeGraph = true;
+            spawnCube.noRepeat = true;
+            spawnCube.shouldSprint = false;
+            spawnCube.shouldFireEquipment = false;
+            spawnCube.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            spawnCube.driverUpdateTimerOverride = 0.5f;
+
+            // Primary Strafe - Basic primary attack when in close range
+            AISkillDriver primaryStrafe = gameObject.AddComponent<AISkillDriver>();
+            primaryStrafe.customName = "PrimaryStrafe";
+            primaryStrafe.skillSlot = SkillSlot.Primary;
+            primaryStrafe.requireSkillReady = true;
+            primaryStrafe.requireEquipmentReady = false;
+            primaryStrafe.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            primaryStrafe.minDistance = 0f;
+            primaryStrafe.maxDistance = 5f;
+            primaryStrafe.selectionRequiresTargetLoS = false;
+            primaryStrafe.activationRequiresTargetLoS = false;
+            primaryStrafe.activationRequiresAimConfirmation = false;
+            primaryStrafe.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            primaryStrafe.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            primaryStrafe.ignoreNodeGraph = true;
+            primaryStrafe.noRepeat = false;
+            primaryStrafe.shouldSprint = false;
+            primaryStrafe.shouldFireEquipment = false;
+            primaryStrafe.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            primaryStrafe.driverUpdateTimerOverride = 0.5f;
+
+            // Primary Chase - Basic primary attack when chasing enemies
+            AISkillDriver primaryChase = gameObject.AddComponent<AISkillDriver>();
+            primaryChase.customName = "PrimaryChase";
+            primaryChase.skillSlot = SkillSlot.Primary;
+            primaryChase.requireSkillReady = true;
+            primaryChase.requireEquipmentReady = false;
+            primaryChase.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            primaryChase.minDistance = 0f;
+            primaryChase.maxDistance = 10f;
+            primaryChase.selectionRequiresTargetLoS = false;
+            primaryChase.activationRequiresTargetLoS = false;
+            primaryChase.activationRequiresAimConfirmation = false;
+            primaryChase.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            primaryChase.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            primaryChase.ignoreNodeGraph = true;
+            primaryChase.noRepeat = false;
+            primaryChase.shouldSprint = false;
+            primaryChase.shouldFireEquipment = false;
+            primaryChase.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            primaryChase.driverUpdateTimerOverride = 0.5f;
+
+            // Salvage Owner - Special skill when following leader
+            AISkillDriver salvageOwner = gameObject.AddComponent<AISkillDriver>();
+            salvageOwner.customName = "SalvageOwner";
+            salvageOwner.skillSlot = SkillSlot.Special;
+            salvageOwner.requireSkillReady = true;
+            salvageOwner.requireEquipmentReady = false;
+            salvageOwner.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
+            salvageOwner.minDistance = 0f;
+            salvageOwner.maxDistance = float.PositiveInfinity;
+            salvageOwner.selectionRequiresTargetLoS = false;
+            salvageOwner.activationRequiresTargetLoS = false;
+            salvageOwner.activationRequiresAimConfirmation = false;
+            salvageOwner.aimType = AISkillDriver.AimType.AtCurrentLeader;
+            salvageOwner.ignoreNodeGraph = false;
+            salvageOwner.noRepeat = false;
+            salvageOwner.shouldSprint = false;
+            salvageOwner.shouldFireEquipment = false;
+            salvageOwner.buttonPressType = AISkillDriver.ButtonPressType.TapContinuous;
+
+            // Strafing - Movement behavior for mid-range combat
+            AISkillDriver strafing = gameObject.AddComponent<AISkillDriver>();
+            strafing.customName = "Strafing";
+            strafing.skillSlot = SkillSlot.None;
+            strafing.requireSkillReady = false;
+            strafing.requireEquipmentReady = false;
+            strafing.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            strafing.minDistance = 20f;
+            strafing.maxDistance = 60f;
+            strafing.selectionRequiresTargetLoS = true;
+            strafing.activationRequiresTargetLoS = true;
+            strafing.activationRequiresAimConfirmation = false;
+            strafing.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            strafing.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            strafing.ignoreNodeGraph = false;
+            strafing.noRepeat = true;
+            strafing.shouldSprint = true;
+            strafing.shouldFireEquipment = false;
+            strafing.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+            strafing.driverUpdateTimerOverride = 0.5f;
+
+            // Sprint Chase - Aggressive pursuit behavior
+            AISkillDriver sprintChase = gameObject.AddComponent<AISkillDriver>();
+            sprintChase.customName = "SprintChase";
+            sprintChase.skillSlot = SkillSlot.None;
+            sprintChase.requireSkillReady = false;
+            sprintChase.requireEquipmentReady = false;
+            sprintChase.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            sprintChase.minDistance = 0f;
+            sprintChase.maxDistance = 400f;
+            sprintChase.selectionRequiresTargetLoS = false;
+            sprintChase.activationRequiresTargetLoS = false;
+            sprintChase.activationRequiresAimConfirmation = false;
+            sprintChase.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            sprintChase.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            sprintChase.ignoreNodeGraph = false;
+            sprintChase.noRepeat = false;
+            sprintChase.shouldSprint = true;
+            sprintChase.shouldFireEquipment = false;
+            sprintChase.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+
+            // Follow Owner - Following behavior
+            AISkillDriver followOwner = gameObject.AddComponent<AISkillDriver>();
+            followOwner.customName = "FollowOwner";
+            followOwner.skillSlot = SkillSlot.None;
+            followOwner.requireSkillReady = false;
+            followOwner.requireEquipmentReady = false;
+            followOwner.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
+            followOwner.minDistance = 15f;
+            followOwner.maxDistance = float.PositiveInfinity;
+            followOwner.selectionRequiresTargetLoS = false;
+            followOwner.activationRequiresTargetLoS = false;
+            followOwner.activationRequiresAimConfirmation = false;
+            followOwner.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            followOwner.aimType = AISkillDriver.AimType.AtCurrentLeader;
+            followOwner.ignoreNodeGraph = false;
+            followOwner.noRepeat = false;
+            followOwner.shouldSprint = true;
+            followOwner.shouldFireEquipment = false;
+            followOwner.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+
+            // Idle Near Owner - Staying close to leader
+            AISkillDriver idleNearOwner = gameObject.AddComponent<AISkillDriver>();
+            idleNearOwner.customName = "IdleNearOwner";
+            idleNearOwner.skillSlot = SkillSlot.None;
+            idleNearOwner.requireSkillReady = false;
+            idleNearOwner.requireEquipmentReady = false;
+            idleNearOwner.moveTargetType = AISkillDriver.TargetType.CurrentLeader;
+            idleNearOwner.minDistance = 0f;
+            idleNearOwner.maxDistance = 15f;
+            idleNearOwner.selectionRequiresTargetLoS = false;
+            idleNearOwner.activationRequiresTargetLoS = false;
+            idleNearOwner.activationRequiresAimConfirmation = false;
+            idleNearOwner.movementType = AISkillDriver.MovementType.Stop;
+            idleNearOwner.aimType = AISkillDriver.AimType.AtCurrentLeader;
+            idleNearOwner.ignoreNodeGraph = false;
+            idleNearOwner.noRepeat = false;
+            idleNearOwner.shouldSprint = false;
+            idleNearOwner.shouldFireEquipment = false;
+            idleNearOwner.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+
+            // Sprint Chase Low Priority - Fallback aggressive behavior
+            AISkillDriver sprintChaseLowPriority = gameObject.AddComponent<AISkillDriver>();
+            sprintChaseLowPriority.customName = "SprintChaseLowPriority";
+            sprintChaseLowPriority.skillSlot = SkillSlot.None;
+            sprintChaseLowPriority.requireSkillReady = false;
+            sprintChaseLowPriority.requireEquipmentReady = false;
+            sprintChaseLowPriority.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            sprintChaseLowPriority.minDistance = 0f;
+            sprintChaseLowPriority.maxDistance = float.PositiveInfinity;
+            sprintChaseLowPriority.selectionRequiresTargetLoS = false;
+            sprintChaseLowPriority.activationRequiresTargetLoS = false;
+            sprintChaseLowPriority.activationRequiresAimConfirmation = false;
+            sprintChaseLowPriority.movementType = AISkillDriver.MovementType.ChaseMoveTarget;
+            sprintChaseLowPriority.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            sprintChaseLowPriority.ignoreNodeGraph = false;
+            sprintChaseLowPriority.noRepeat = false;
+            sprintChaseLowPriority.shouldSprint = true;
+            sprintChaseLowPriority.shouldFireEquipment = false;
+            sprintChaseLowPriority.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+
+            // Hit Cube - Primary skill when cubes are available
+            AISkillDriver hitCube = gameObject.AddComponent<AISkillDriver>();
+            hitCube.customName = "HitCube";
+            hitCube.skillSlot = SkillSlot.Primary;
+            hitCube.requireSkillReady = true;
+            hitCube.requireEquipmentReady = false;
+            hitCube.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            hitCube.minDistance = 0f;
+            hitCube.maxDistance = 60f;
+            hitCube.selectionRequiresTargetLoS = true;
+            hitCube.activationRequiresTargetLoS = true;
+            hitCube.activationRequiresAimConfirmation = false;
+            hitCube.movementType = AISkillDriver.MovementType.StrafeMovetarget;
+            hitCube.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            hitCube.ignoreNodeGraph = false;
+            hitCube.noRepeat = false;
+            hitCube.shouldSprint = false;
+            hitCube.shouldFireEquipment = false;
+            hitCube.buttonPressType = AISkillDriver.ButtonPressType.Hold;
+            hitCube.driverUpdateTimerOverride = 1f;
+
+            // Release Input - Input release behavior
+            AISkillDriver releaseInput = gameObject.AddComponent<AISkillDriver>();
+            releaseInput.customName = "ReleaseInput";
+            releaseInput.skillSlot = SkillSlot.None;
+            releaseInput.requireSkillReady = false;
+            releaseInput.requireEquipmentReady = false;
+            releaseInput.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
+            releaseInput.minDistance = 0f;
+            releaseInput.maxDistance = float.PositiveInfinity;
+            releaseInput.selectionRequiresTargetLoS = false;
+            releaseInput.activationRequiresTargetLoS = false;
+            releaseInput.activationRequiresAimConfirmation = false;
+            releaseInput.aimType = AISkillDriver.AimType.AtCurrentEnemy;
+            releaseInput.ignoreNodeGraph = false;
+            releaseInput.noRepeat = false;
+            releaseInput.shouldSprint = false;
+            releaseInput.shouldFireEquipment = false;
+            releaseInput.buttonPressType = AISkillDriver.ButtonPressType.Abstain;
+            releaseInput.driverUpdateTimerOverride = 0.4f;
+
+            // Set up skill driver priorities using nextHighPriorityOverride (ImprovedSurvivorAI approach)
+            cleanup.nextHighPriorityOverride = releaseInput;
+            repossessThrow.nextHighPriorityOverride = releaseInput;
+            repossess.nextHighPriorityOverride = repossessSlam;
+            spawnCube.nextHighPriorityOverride = hitCube;
+
+            // Add default skills as fallback
             AddDefaultSkills(gameObject, ai, 0);
-
-            // Cache all skill drivers for reordering
-            allSkillDrivers = gameObject.GetComponents<AISkillDriver>();
         }
 
         public override void OnBodyChange()
         {
             base.OnBodyChange();
-            this.bagController = null;
-            this.swingCount = 0;
-            this.wasBagFull = false;
-            
-            // Re-cache skill drivers when body changes
-            if (controller?.body != null)
-            {
-                allSkillDrivers = controller.body.gameObject.GetComponents<AISkillDriver>();
-                foreach (var driver in allSkillDrivers)
-                {
-                    if (driver.customName == "Primary")
-                    {
-                        primarySkillDriver = driver;
-                    }
-                    else if (driver.customName == "UtilityThrow")
-                    {
-                        utilitySkillDriver = driver;
-                    }
-                }
-            }
+            // No additional setup needed for ImprovedSurvivorAI approach
         }
 
         public override void OnFixedUpdate()
         {
             base.OnFixedUpdate();
-
-            // Get bag controller if not cached
-            if (this.bagController == null && controller?.body != null)
-            {
-                this.bagController = controller.body.GetComponent<DrifterBagController>();
-            }
-
-            if (this.bagController == null || primarySkillDriver == null || utilitySkillDriver == null)
-            {
-                return;
-            }
-
-            bool isBagFull = this.bagController.bagFull;
-
-            // Track when bag status changes
-            if (isBagFull && !wasBagFull)
-            {
-                // Just grabbed something, reset swing count
-                swingCount = 0;
-            }
-            else if (!isBagFull && wasBagFull)
-            {
-                // Bag was emptied, reset swing count
-                swingCount = 0;
-            }
-
-            wasBagFull = isBagFull;
-
-            // Check if primary skill was just used (approximate by checking skill stock/cooldown)
-            if (isBagFull && controller?.body?.skillLocator?.primary != null)
-            {
-                var primarySkill = controller.body.skillLocator.primary;
-                
-                // If skill is on cooldown, it was just used
-                if (primarySkill.stock < primarySkill.maxStock)
-                {
-                    // Increment swing count (this will increment multiple times during cooldown,
-                    // but we'll use a simple approach and check every few frames)
-                    if (Time.frameCount % 30 == 0) // Check roughly every 0.5 seconds at 60fps
-                    {
-                        swingCount++;
-                    }
-                }
-            }
-
-            // Adjust skill driver priorities based on bag status and swing count
-            if (isBagFull)
-            {
-                // Check if we should throw after enough swings
-                bool shouldAttemptThrow = swingCount >= swingsBeforeThrow && Random.value < throwChance;
-
-                if (shouldAttemptThrow && controller?.body?.skillLocator?.utility != null)
-                {
-                    var utilitySkill = controller.body.skillLocator.utility;
-                    
-                    // Only enable throw if utility is ready
-                    if (utilitySkill.IsReady())
-                    {
-                        // Enable utility throw driver
-                        utilitySkillDriver.minDistance = 0;
-                        utilitySkillDriver.maxDistance = 999f;
-                        
-                        // Disable primary temporarily to allow throw
-                        primarySkillDriver.minDistance = 0;
-                        primarySkillDriver.maxDistance = 0; // Disable
-                        
-                        // Reset swing count after attempting throw
-                        swingCount = 0;
-                    }
-                    else
-                    {
-                        // Utility not ready, continue smacking
-                        EnablePrimaryDriver();
-                        DisableUtilityThrowDriver();
-                    }
-                }
-                else
-                {
-                    // Continue smacking
-                    EnablePrimaryDriver();
-                    DisableUtilityThrowDriver();
-                }
-            }
-            else
-            {
-                // Reset to normal behavior when bag is empty
-                primarySkillDriver.minDistance = 0;
-                primarySkillDriver.maxDistance = 10;
-                primarySkillDriver.requireSkillReady = false;
-                primarySkillDriver.selectionRequiresTargetLoS = true;
-                primarySkillDriver.activationRequiresTargetLoS = true;
-                
-                DisableUtilityThrowDriver();
-            }
-        }
-
-        private void EnablePrimaryDriver()
-        {
-            primarySkillDriver.minDistance = 0;
-            primarySkillDriver.maxDistance = 999f; // Always in range
-            primarySkillDriver.requireSkillReady = false;
-            primarySkillDriver.selectionRequiresTargetLoS = false;
-            primarySkillDriver.activationRequiresTargetLoS = false;
-        }
-
-        private void DisableUtilityThrowDriver()
-        {
-            utilitySkillDriver.minDistance = 0;
-            utilitySkillDriver.maxDistance = 0; // Disable
+            // ImprovedSurvivorAI approach doesn't require complex runtime updates
         }
     }
 }

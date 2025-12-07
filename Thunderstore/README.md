@@ -55,6 +55,7 @@ A fork of a mod for Risk of Rain 2 with added features and more custom character
 | [Jinx](https://thunderstore.io/package/lemonlust/JinxMod/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/lemonlust-JinxMod-1.4.2.png.128x128_q95.jpg)   
 | [Lee Hyperreal](https://thunderstore.io/package/PopcornFactory/Lee_Hyperreal/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/PopcornFactory-Lee_Hyperreal-2.1.4.png.128x128_q95.jpg)  
 | [Nemesis Commando](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/) | ![alt text](https://starstorm2.wiki.gg/images/thumb/Nemesis_Commando.png/128px-Nemesis_Commando.png?1cd744)  
+| [Nemesis Enforcer](https://thunderstore.io/package/EnforcerGang/Enforcer/) | ![alt text](https://raw.githubusercontent.com/TheTimeSweeper/EnforcerMod/refs/heads/master/EnforcerMod_Unity/Enforcer/Assets/Enforcer/Nemesis/Icons/texNemesisUnlockAchievement.png)  
 | [Nemesis Mercenary](https://thunderstore.io/package/TeamMoonstorm/Starstorm2/) | ![alt text](https://starstorm2.wiki.gg/images/thumb/Nemesis_Mercenary.png/128px-Nemesis_Mercenary.png?4e34d5)  
 | [Pathfinder](https://thunderstore.io/package/Bog/Pathfinder/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/Bog-Pathfinder-0.5.3.png.128x128_q95.png)  
 | [Pilot](https://thunderstore.io/package/EnforcerGang/Pilot/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/EnforcerGang-Pilot-0.6.1.png.128x128_q95.png)  
@@ -64,6 +65,7 @@ A fork of a mod for Risk of Rain 2 with added features and more custom character
 | [Rocket (Raccoon)](https://thunderstore.io/package/VCR/RocketRaccoon/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/VCR-RocketRaccoon-1.0.9.png.128x128_q95.png)  
 | [Scout](https://thunderstore.io/package/tsuyoikenko/Scout/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/tsuyoikenko-Scout-0.9.8.png.128x128_q95.jpg)  
 | [Sett](https://thunderstore.io/package/Bog/Deputy/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/lemonlust-SettMod-4.6.2.png.128x128_q95.png)  
+| [Shock Trooper](https://thunderstore.io/package/The_Constellate/Shock_Trooper/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/The_Constellate-Shock_Trooper-1.1.11.png.128x128_q95.png)  
 | [Sorceress](https://thunderstore.io/package/Frosthex/SorceressMod/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/Frosthex-SorceressMod-0.7.2.png.128x128_q95.png)  
 | [Spy](https://thunderstore.io/package/tsuyoikenko/Spy/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/tsuyoikenko-Spy-1.3.2.png.128x128_q95.png)  
 | [Submariner](https://thunderstore.io/package/tsuyoikenko/Submariner/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/tsuyoikenko-Submariner-1.1.3.png.128x128_q95.png)  
@@ -73,7 +75,7 @@ A fork of a mod for Risk of Rain 2 with added features and more custom character
 | [Zeri](https://thunderstore.io/package/DragonycksModdingComms/Zeri/) | ![alt text](https://gcdn.thunderstore.io/live/repository/icons/DragonycksModdingComms-Zeri-1.0.4.png.128x128_q95.jpg)   
 
 </details>
-## How to Spawn Bots
+## How to Spawn Bots   
 You can spawn bots by opening your console (ctrl + alt + tilda) and running the command `addbot [survivor name OR survivor index] [amount]` or `addrandombot [amount]`. All arguements are optional and have a default value if they are not given. Example: `addbot engineer 5` will spawn 5 engineers that follow you.
 
 If you have friends in your lobby that you want to spawn bots for, add their slot number in the lobby after the rest of the arguements. Example: `addbot engineer 5 3` will spawn 5 engineers for the 3rd player in the lobby.
@@ -96,12 +98,23 @@ Alternatively, you can set the amount of bots spawned at the beginning of a run 
 
 `tpbots` - Teleports all the bots to your position
 
-## Support
+## Compatability List  
+
+**Compatable:**  
+[ImprovedSurvivorAI](https://thunderstore.io/package/Samuel17/ImprovedSurvivorAI/)  
+[ShareSuite](https://thunderstore.io/c/riskofrain2/p/FunkFrog-and-Sipondo/ShareSuite/)  
+
+**Incompatable:**  
+[TeammateRevival](https://thunderstore.io/package/Moffein/TeammateRevival/)  
+
+
+## Support  
 
 You can support Meledy *(original creator)* at [https://buymeacoffee.com/melledy](https://buymeacoffee.com/melledy) if you like this mod.
 
 ## Credits  
 Meledy - for the [original PlayerBots](https://thunderstore.io/package/Meledy/PlayerBots/) mod.  
 .score - for [LemurFusion](https://thunderstore.io/package/score/LemurFusion/), used for the teleportation feature and VFX.  
+Samuel - for [ImprovedSurvivorAI](https://thunderstore.io/package/Samuel17/ImprovedSurvivorAI/), decided to use their Drifter and Operator AI instead.
 
 **DISCLAIMER**: This fork uses AI to generate code for fixes/additions.

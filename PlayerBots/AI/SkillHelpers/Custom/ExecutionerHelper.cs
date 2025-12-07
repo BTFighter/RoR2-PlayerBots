@@ -32,12 +32,12 @@ namespace PlayerBots.AI.SkillHelpers.Custom
             skill4.requireSkillReady = true;
             skill4.moveTargetType = AISkillDriver.TargetType.CurrentEnemy;
             skill4.minDistance = 0;
-            skill4.maxDistance = 30;
+            skill4.maxDistance = 25;
             skill4.selectionRequiresTargetLoS = true;
             skill4.activationRequiresTargetLoS = true;
             skill4.activationRequiresAimConfirmation = true;
             skill4.movementType = AISkillDriver.MovementType.Stop;
-            skill4.aimType = AISkillDriver.AimType.AtMoveTarget;
+            skill4.aimType = AISkillDriver.AimType.AtCurrentEnemy;
             skill4.ignoreNodeGraph = false;
             skill4.resetCurrentEnemyOnNextDriverSelection = false;
             skill4.noRepeat = true;

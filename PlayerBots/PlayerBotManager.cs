@@ -15,6 +15,7 @@ using UnityEngine;
 namespace PlayerBots
 {
     [BepInPlugin("com.meledy.PlayerBots", "PlayerBots", "1.7.1")]
+    [BepInDependency("com.EnforcerGang.Enforcer", BepInDependency.DependencyFlags.SoftDependency)]
     public class PlayerBotManager : BaseUnityPlugin
     {
         public static BepInEx.Logging.ManualLogSource BotLogger { get; private set; }
